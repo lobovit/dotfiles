@@ -222,39 +222,41 @@
 (blink-cursor-mode -1)
 
 (defalias 'yes-or-no-p 'y-or-n-p)
-(if (fboundp 'tool-bar-mode) (tool-bar-mode -1))
-(if (fboundp 'scroll-bar-mode) (scroll-bar-mode -1))
-(if (fboundp 'tooltip-mode) (tooltip-mode -1))
-(if (fboundp 'menu-bar-mode) (menu-bar-mode -1))
-(if (fboundp 'x-cut-buffer-or-selection-value)
-		(setq x-select-enable-clipboard t
-		interprogram-paste-function 'x-cut-buffer-or-selection-value))
+(when (fboundp 'tool-bar-mode) (tool-bar-mode -1))
+(when (fboundp 'scroll-bar-mode) (scroll-bar-mode -1))
+(when (fboundp 'tooltip-mode) (tooltip-mode -1))
+(when (fboundp 'menu-bar-mode) (menu-bar-mode -1))
+(when (fboundp 'x-cut-buffer-or-selection-value)
+  (setq x-select-enable-clipboard t
+        interprogram-paste-function 'x-cut-buffer-or-selection-value))
 
 (condition-case exc
-		(progn
-	(add-to-list 'custom-theme-load-path
-				 (concat user-emacs-directory "themes"))
-	(if window-system
-			(progn
-				(mouse-wheel-mode t)
-				(blink-cursor-mode 1)
-				(add-to-list 'default-frame-alist '(height . 40))
-				(add-to-list 'default-frame-alist '(width . 100))
-				;; fonts
-				(let ((myfont "Inconsolata-14:weight=bold"))
-			(set-frame-font myfont)
-			(add-to-list 'default-frame-alist (cons 'font myfont)))
-				;; themes
-				(require 'package)
-				(unless (package-installed-p 'gruvbox-theme)
-		(package-refresh-contents)
-		(package-install 'gruvbox-theme))
-				(load-theme 'gruvbox-dark-hard t)))
-	(if (string= (getenv "TERM") "xterm-256color")
-			(load-theme 'gruvbox-dark-hard t)
-			(load-theme 'tango-dark t)))
-		('error
-		 (warn (format "Caught exception: [%s]" exc))))
+    (progn
+      (add-to-list 'custom-theme-load-path
+                   (concat user-emacs-directory "themes"))
+      (when window-system
+        (mouse-wheel-mode t)
+        (blink-cursor-mode 1)
+        (add-to-list 'default-frame-alist '(height . 40))
+        (add-to-list 'default-frame-alist '(width . 100))
+        ;; fonts
+        (let ((myfont "Martian mono cn bd-14")
+              (fallback-font "Consolas Bold-14"))
+          (if (member myfont (font-family-list))
+              (set-frame-font myfont)
+            (set-frame-font fallback-font))
+          (add-to-list 'default-frame-alist (cons 'font (frame-parameter nil 'font))))
+        ;; themes
+        (require 'package)
+        (unless (package-installed-p 'gruvbox-theme)
+          (package-refresh-contents)
+          (package-install 'gruvbox-theme))
+        (load-theme 'gruvbox-dark-hard t))
+      (if (string= (getenv "TERM") "xterm-256color")
+          (load-theme 'gruvbox-dark-hard t)
+        (load-theme 'tango-dark t)))
+  (error
+   (warn (format "Caught exception: [%s]" exc))))
 
 (delete 'try-expand-line hippie-expand-try-functions-list)
 (delete 'try-expand-list hippie-expand-try-functions-list)
@@ -286,7 +288,6 @@
 ;; Package Management
 
 (require 'package)
-(package-initialize)
 
 (add-to-list 'package-archives
 						 '("melpa". "https://melpa.org/packages/") t)
