@@ -4,29 +4,28 @@
 
 (defvar dotfiles-dir (expand-file-name "site-lisp" "C:\\Users\\lobor\\AppData\\Roaming\\.emacs.d"))
 
-
 (defun lobo-require-packages (packages)
-	(dolist (package packages)
-		(when (not (package-installed-p package))
-			(package-install package))))
+  (dolist (package packages)
+    (when (not (package-installed-p package))
+      (package-install package))))
 
 (defun lobo-recentf-ido-find-file ()
-	"Encontra um arquivo recente usando ido."
-	(interactive)
-	(let ((file (ido-completing-read "Escolha um arquivo recente: " recentf-list nil t)))
-		(when file
-			(find-file file))))
+  "Encontra um arquivo recente usando ido."
+  (interactive)
+  (let ((file (ido-completing-read "Escolha um arquivo recente: " recentf-list nil t)))
+    (when file
+      (find-file file))))
 
 (defun custom-isearch-toggle ()
-	"Alternar entre isearch-forward e isearch-backward."
-	(interactive)
-	(if (eq isearch-forward t)
-			(progn
-				(isearch-exit)
-				(isearch-backward))
-		(progn
-			(isearch-exit)
-			(isearch-forward))))
+  "Alternar entre isearch-forward e isearch-backward."
+  (interactive)
+  (if (eq isearch-forward t)
+      (progn
+        (isearch-exit)
+        (isearch-backward))
+    (progn
+      (isearch-exit)
+      (isearch-forward))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Vinculação de Chaves
@@ -99,9 +98,9 @@
 ;;;;;;;;;;;;;;;;;;;;;;
 
 (use-package projectile
-		:ensure t
-		:init
-		(projectile-mode 1))
+    :ensure t
+    :init
+    (projectile-mode 1))
 
 (global-set-key (kbd "<f7>") 'projectile-compile-project)
 
@@ -109,12 +108,12 @@
 ;; Custom Settings
 
 ;; backup in.saves directory
-(setq backup-directory-alist `((".". "~/.saves")))
+(setq backup-directory-alist `(("." . "~/.saves")))
 
 ;; force bash with my shell
 (defvar my-term-shell "/usr/local/bin/bash")
 (defadvice ansi-term (before force-bash)
-		(interactive (list my-term-shell)))
+    (interactive (list my-term-shell)))
 (ad-activate 'ansi-term)
 
 (global-set-key (kbd "<s-return>") 'ansi-term)
@@ -169,9 +168,9 @@
 
 ;; Allow clipboard from outside emacs
 (setq select-enable-clipboard t
-				save-interprogram-paste-before-kill t
-				apropos-do-all t
-				mouse-yank-at-point t)
+        save-interprogram-paste-before-kill t
+        apropos-do-all t
+        mouse-yank-at-point t)
 
 ;; Improve performance of very long lines
 (setq-default bidi-display-reordering 'left-to-right)
@@ -182,26 +181,26 @@
 
 ;; Remove all minor modes (mode-line-modes)
 (setq-default mode-line-format
-				'("%e"
-				mode-line-front-space
-				mode-line-mule-info
-				mode-line-client
-				mode-line-modified
-				mode-line-remote
-				mode-line-frame-identification
-				mode-line-buffer-identification
-				"    "
-				mode-line-position
-				(vc-mode vc-mode)
-				" (" mode-name ") "
-				mode-line-misc-info
-				mode-line-end-spaces))
+        '("%e"
+        mode-line-front-space
+        mode-line-mule-info
+        mode-line-client
+        mode-line-modified
+        mode-line-remote
+        mode-line-frame-identification
+        mode-line-buffer-identification
+        "    "
+        mode-line-position
+        (vc-mode vc-mode)
+        " (" mode-name ") "
+        mode-line-misc-info
+        mode-line-end-spaces))
 
 ;; Add Date
 (setq display-time-day-and-date t
-				display-time-format "%a %b %d %R"
-				display-time-interval 60
-				display-time-default-load-average nil)
+        display-time-format "%a %b %d %R"
+        display-time-interval 60
+        display-time-default-load-average nil)
 (display-time)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -290,42 +289,46 @@
 (require 'package)
 
 (add-to-list 'package-archives
-						 '("melpa". "https://melpa.org/packages/") t)
+             '("melpa" . "http://melpa.org/packages/") t)
+
+(package-initialize)
+(when (not package-archive-contents)
+  (package-refresh-contents))
 
 ;; Ensure use-package is installed
 (when (not (package-installed-p 'use-package))
-		(package-refresh-contents)
-		(package-install 'use-package))
+    (package-refresh-contents)
+    (package-install 'use-package))
 
 (eval-when-compile
-		(require 'use-package))
+    (require 'use-package))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;; Rgrep
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (use-package rg
-		:ensure t
-		:config
-		(rg-define-search my/rg-project
-		"Search for any files in project or current directory"
-		:query ask
-		:format literal
-		:confirm prefix
-		:files "everything"
-		:flags ("--hidden -g!.git")
-		:dir (if (vc-root-dir)
-						 (vc-root-dir)
-						 default-directory))
-		:bind
-		("C-S-h". my/rg-project))
+    :ensure t
+    :config
+    (rg-define-search my/rg-project
+    "Search for any files in project or current directory"
+    :query ask
+    :format literal
+    :confirm prefix
+    :files "everything"
+    :flags ("--hidden -g!.git")
+    :dir (if (vc-root-dir)
+             (vc-root-dir)
+             default-directory))
+    :bind
+    ("C-S-h" . my/rg-project))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; CUSTOM LANGS
 
 ;; load custom langs *.el files
 (dolist (file (directory-files (expand-file-name "custom" user-emacs-directory) t "\\.el$"))
-		(load file))
+  (load-file file))
 
 (custom-set-variables
  ;; custom-set-variables was added by Custom.
@@ -334,9 +337,9 @@
  ;; If there is more than one, they won't work right.
  '(custom-enabled-themes '(gruvbox-dark-hard))
  '(custom-safe-themes
-	 '("0971e976bc1092a52cf092bec03f3adf63dfdb7c1a2820ab9e214845a0f5eb72" "a5270d86fac30303c5910be7403467662d7601b821af2ff0c4eb181153ebfc0a" "d445c7b530713eac282ecdeea07a8fa59692c83045bf84dd112dd738c7bcad1d" "7422e5b955cf72a2657e0b932ce00efcaee3cffd663f5d701d2442a74ab17dbf" default))
+   '("0971e976bc1092a52cf092bec03f3adf63dfdb7c1a2820ab9e214845a0f5eb72" "a5270d86fac30303c5910be7403467662d7601b821af2ff0c4eb181153ebfc0a" "d445c7b530713eac282ecdeea07a8fa59692c83045bf84dd112dd738c7bcad1d" "7422e5b955cf72a2657e0b932ce00efcaee3cffd663f5d701d2442a74ab17dbf" default))
  '(package-selected-packages
-	 '(yasnippet ccls flycheck-pos-tip company-box lsp-ivy rainbow-delimiters ivy projectile wgrep-ag multiple-cursors gruvbox-theme dap-mode go-add-tags go-fill-struct lsp-mode web-mode rg rainbow-mode paredit markdown-mode magit htmlize go-mode flymake-shellcheck expand-region emmet-mode))
+   '(yasnippet ccls flycheck-pos-tip company-box lsp-ivy rainbow-delimiters ivy projectile wgrep-ag multiple-cursors gruvbox-theme dap-mode go-add-tags go-fill-struct lsp-mode web-mode rg rainbow-mode paredit markdown-mode magit htmlize go-mode flymake-shellcheck expand-region emmet-mode))
  '(warning-suppress-types '((use-package))))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
@@ -344,3 +347,4 @@
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
  )
+
