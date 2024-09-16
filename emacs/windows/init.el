@@ -2,6 +2,9 @@
 
 ;;; Configuração do Emacs para Windows
 
+(setq debug-on-warning t)
+
+
 (defvar dotfiles-dir (expand-file-name "site-lisp" "C:\\Users\\lobor\\AppData\\Roaming\\.emacs.d"))
 
 (defun lobo-require-packages (packages)
@@ -103,6 +106,16 @@
     (projectile-mode 1))
 
 (global-set-key (kbd "<f7>") 'projectile-compile-project)
+
+;; utf8
+(set-language-environment "UTF-8")
+(prefer-coding-system 'utf-8)
+(set-default-coding-systems 'utf-8)
+(set-terminal-coding-system 'utf-8)
+(set-keyboard-coding-system 'utf-8)
+(set-buffer-file-coding-system 'utf-8)
+(setq-default buffer-file-coding-system 'utf-8)
+
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Custom Settings
@@ -347,4 +360,3 @@
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
  )
-
