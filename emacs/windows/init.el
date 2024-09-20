@@ -1,9 +1,6 @@
-;;; Code
-
 ;;; Configuração do Emacs para Windows
 
-(setq debug-on-warning t)
-
+(setq debug-on-warning nil) ; Desativado para evitar muitos logs de depuração
 
 (defvar dotfiles-dir (expand-file-name "site-lisp" "C:\\Users\\lobor\\AppData\\Roaming\\.emacs.d"))
 
@@ -19,344 +16,242 @@
     (when file
       (find-file file))))
 
-(defun custom-isearch-toggle ()
-  "Alternar entre isearch-forward e isearch-backward."
-  (interactive)
-  (if (eq isearch-forward t)
-      (progn
-        (isearch-exit)
-        (isearch-backward))
-    (progn
-      (isearch-exit)
-      (isearch-forward))))
-
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Vinculação de Chaves
-
-(global-set-key (kbd "C-x f") 'lobo-recentf-ido-find-file)
-
-;; Saindo
-;; O acrônimo é C-x REALLY QUIT
-(global-set-key (kbd "C-x r q") 'save-buffers-kill-terminal)
-;(global-set-key (kbd "C-x C-c") 'delete-frame)
-
-;; Configuração personalizada de chaves
-
-;; Salvar arquivos
-(global-set-key (kbd "C-s") 'save-buffer)
-
-;; Ctrl + a para selecionar tudo
-(global-set-key (kbd "C-a") 'mark-whole-buffer)
-
-;; Pesquisa
-(global-set-key (kbd "C-f") 'custom-isearch-toggle)
-
-;; Colar
-(global-set-key (kbd "C-v") 'yank)
-
-;; Cortar
-(global-set-key (kbd "C-S-x") 'kill-region)
-
-;; Substituir
-(global-set-key (kbd "C-r") 'query-replace)
-
-;; Desfazer
-(global-set-key (kbd "C-z") 'undo)
-
-;; Refazer
-(global-set-key (kbd "C-S-z") 'undo-redo)
 
 ;; Recarregar configuração do Emacs
 (global-set-key [f5] 'eval-buffer)
 (global-set-key [f6] 'dired)
 
+;; Eshell
+(global-set-key (kbd "C-x t") 'eshell)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; Global Modes
-
-(require 'ansi-color)
-(require 'recentf)
-(require 'ffap)
-(require 'uniquify)
+;; Global Settings
 
 (auto-compression-mode t)
-(auto-fill-mode 1)
-(delete-selection-mode 1)
-(global-font-lock-mode t)
-;(global-whitespace-mode 1)
-
-;; Line Numbers
 (global-display-line-numbers-mode t)
-
-;; Navigate sillycased words
+(global-font-lock-mode t)
 (global-subword-mode 1)
-
 (ido-mode t)
 (recentf-mode 1)
 (show-paren-mode 1)
 (global-visual-line-mode 1)
-
-;;;;;;;;;;;;;;;;;;;;;;;
-;;; projectile
-;;;;;;;;;;;;;;;;;;;;;;
-
-(use-package projectile
-    :ensure t
-    :init
-    (projectile-mode 1))
-
-(global-set-key (kbd "<f7>") 'projectile-compile-project)
-
-;; utf8
-(set-language-environment "UTF-8")
-(prefer-coding-system 'utf-8)
-(set-default-coding-systems 'utf-8)
-(set-terminal-coding-system 'utf-8)
-(set-keyboard-coding-system 'utf-8)
-(set-buffer-file-coding-system 'utf-8)
-(setq-default buffer-file-coding-system 'utf-8)
-
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; Custom Settings
-
-;; backup in.saves directory
-(setq backup-directory-alist `(("." . "~/.saves")))
-
-;; force bash with my shell
-(defvar my-term-shell "/usr/local/bin/bash")
-(defadvice ansi-term (before force-bash)
-    (interactive (list my-term-shell)))
-(ad-activate 'ansi-term)
-
-(global-set-key (kbd "<s-return>") 'ansi-term)
-
+(delete-selection-mode 1)
 (column-number-mode t)
-;(custom-file (concat user-emacs-directory "custom.el"))
+(auto-fill-mode 1)
 
-(indent-tabs-mode nil)
+(setq-default indent-tabs-mode nil
+              require-final-newline t
+              show-trailing-whitespace t
+              x-stretch-cursor t
+              truncate-lines nil)
 
-;; When on a tab, make the cursor the tab length…
-(setq-default x-stretch-cursor t)
+(setq create-lockfiles nil
+      save-interprogram-paste-before-kill nil
+      select-enable-primary nil
+      electric-pair-mode 1
+      electric-indent-mode 1
+      line-number-mode t
+      column-number-mode t
+      select-enable-clipboard t
+      bidi-display-reordering 'left-to-right)
 
-;; But never insert tabs…
-(set-default 'indent-tabs-mode nil)
-
-;; Except in Makefiles.
-(add-hook 'makefile-mode-hook 'indent-tabs-mode)
-
-;; Keep files clean.
-(setq-default require-final-newline t)
-
-(setq-default show-trailing-whitespace t)
 (add-hook 'before-save-hook 'whitespace-cleanup)
 
-;; Don't write lock-files
-(setq create-lockfiles nil)
-
-;; Fix empty clipboard error
-(setq save-interprogram-paste-before-kill nil)
-
-;; Remove text in active region if inserting text
-(delete-selection-mode 1)
-
-;; Don't automatically copy selected text
-(setq select-enable-primary nil)
-
-;; Auto-close brackets and double quotes
-(electric-pair-mode 1)
-
-;; Don't automatically indent lines
-(electric-indent-mode 1)
-
-;; Always display line and column numbers
-(setq line-number-mode t)
-(setq column-number-mode t)
-
-;; Word wrap (t is no wrap, nil is wrap)
-(setq-default truncate-lines nil)
-
-;; Don't use shift to mark things.
-;(setq shift-select-mode nil)
-
-;; Allow clipboard from outside emacs
-(setq select-enable-clipboard t
-        save-interprogram-paste-before-kill t
-        apropos-do-all t
-        mouse-yank-at-point t)
-
-;; Improve performance of very long lines
-(setq-default bidi-display-reordering 'left-to-right)
-
-
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; Mode-line
-
-;; Remove all minor modes (mode-line-modes)
-(setq-default mode-line-format
-        '("%e"
-        mode-line-front-space
-        mode-line-mule-info
-        mode-line-client
-        mode-line-modified
-        mode-line-remote
-        mode-line-frame-identification
-        mode-line-buffer-identification
-        "    "
-        mode-line-position
-        (vc-mode vc-mode)
-        " (" mode-name ") "
-        mode-line-misc-info
-        mode-line-end-spaces))
-
-;; Add Date
-(setq display-time-day-and-date t
-        display-time-format "%a %b %d %R"
-        display-time-interval 60
-        display-time-default-load-average nil)
-(display-time)
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; UI
-
-;; inhibit emacs initial messages
-(setq inhibit-startup-screen t)
-(setq initial-scratch-message nil)
-
-;; No alarms.
-(setq ring-bell-function 'ignore)
-
-;; Productive default mode.
-;(setq initial-major-mode 'org-mode)
-
-;; Change cursor.
-(setq-default cursor-type 'box)
-(blink-cursor-mode -1)
-
-(defalias 'yes-or-no-p 'y-or-n-p)
-(when (fboundp 'tool-bar-mode) (tool-bar-mode -1))
-(when (fboundp 'scroll-bar-mode) (scroll-bar-mode -1))
-(when (fboundp 'tooltip-mode) (tooltip-mode -1))
-(when (fboundp 'menu-bar-mode) (menu-bar-mode -1))
-(when (fboundp 'x-cut-buffer-or-selection-value)
-  (setq x-select-enable-clipboard t
-        interprogram-paste-function 'x-cut-buffer-or-selection-value))
-
-(condition-case exc
-    (progn
-      (add-to-list 'custom-theme-load-path
-                   (concat user-emacs-directory "themes"))
-      (when window-system
-        (mouse-wheel-mode t)
-        (blink-cursor-mode 1)
-        (add-to-list 'default-frame-alist '(height . 40))
-        (add-to-list 'default-frame-alist '(width . 100))
-        ;; fonts
-        (let ((myfont "Martian mono cn bd-14")
-              (fallback-font "Consolas Bold-14"))
-          (if (member myfont (font-family-list))
-              (set-frame-font myfont)
-            (set-frame-font fallback-font))
-          (add-to-list 'default-frame-alist (cons 'font (frame-parameter nil 'font))))
-        ;; themes
-        (require 'package)
-        (unless (package-installed-p 'gruvbox-theme)
-          (package-refresh-contents)
-          (package-install 'gruvbox-theme))
-        (load-theme 'gruvbox-dark-hard t))
-      (if (string= (getenv "TERM") "xterm-256color")
-          (load-theme 'gruvbox-dark-hard t)
-        (load-theme 'tango-dark t)))
-  (error
-   (warn (format "Caught exception: [%s]" exc))))
-
-(delete 'try-expand-line hippie-expand-try-functions-list)
-(delete 'try-expand-list hippie-expand-try-functions-list)
-(add-to-list 'completion-ignored-extensions ".d")  ;; "cc -MD" depends files
-(add-to-list 'completion-ignored-extensions ".test")
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; Initialization
-
-(random t)
-;(add-to-list 'load-path (concat dotfiles-dir "lisp"))
-(setq locale-coding-system 'utf-8)
-(set-terminal-coding-system 'utf-8)
-(set-keyboard-coding-system 'utf-8)
-(set-selection-coding-system 'utf-8)
-(prefer-coding-system 'utf-8)
-
-(setq-default
- c-basic-offset 2
- c-file-style nil
- coffee-tab-width 2
- css-indent-offset 2
- fill-column 80
- save-place t
- tab-width 2
- truncate-lines t)
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; Package Management
+;; LSP, Helm, Projectile, etc.
 
 (require 'package)
 
-(add-to-list 'package-archives
-             '("melpa" . "http://melpa.org/packages/") t)
+(setq package-archives '(("melpa" . "https://melpa.org/packages/")
+                         ("elpa" . "https://elpa.gnu.org/packages/")
+                         ("org" . "https://orgmode.org/elpa/")))
 
 (package-initialize)
-(when (not package-archive-contents)
-  (package-refresh-contents))
 
-;; Ensure use-package is installed
-(when (not (package-installed-p 'use-package))
-    (package-refresh-contents)
-    (package-install 'use-package))
+(unless package-archive-contents (package-refresh-contents))
 
-(eval-when-compile
-    (require 'use-package))
+(setq package-list '(use-package))
+(dolist (package package-list)
+  (unless (package-installed-p package)
+    (package-install package)))
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;;;; Rgrep
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(use-package rg
-    :ensure t
-    :config
-    (rg-define-search my/rg-project
-    "Search for any files in project or current directory"
-    :query ask
-    :format literal
-    :confirm prefix
-    :files "everything"
-    :flags ("--hidden -g!.git")
-    :dir (if (vc-root-dir)
-             (vc-root-dir)
-             default-directory))
-    :bind
-    ("C-S-h" . my/rg-project))
+;; Chords
+(use-package use-package-chords
+  :ensure t
+  :init
+  :config (key-chord-mode 1)
+(setq key-chord-two-keys-delay 0.4)
+(setq key-chord-one-key-delay 0.5))
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; CUSTOM LANGS
+;; Projectile
+(use-package projectile
+  :ensure t
+  :init (projectile-mode +1)
+  :config
+  (define-key projectile-mode-map (kbd "C-c p") 'projectile-command-map))
 
-;; load custom langs *.el files
-(dolist (file (directory-files (expand-file-name "custom" user-emacs-directory) t "\\.el$"))
-  (load-file file))
+;; Helm
+(use-package helm
+  :ensure t
+  :init (helm-mode 1)
+  :bind
+  (("C-c h" . helm-command-prefix)
+   ("M-x" . helm-M-x)
+   ("C-x C-f" . helm-find-files)
+   ("C-x b" . helm-buffers-list)
+   ("C-c b" . helm-bookmarks)
+   ("C-c f" . helm-recentf)
+   ("C-c g" . helm-grep-do-git-grep)))
 
-(custom-set-variables
- ;; custom-set-variables was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- '(custom-enabled-themes '(gruvbox-dark-hard))
- '(custom-safe-themes
-   '("0971e976bc1092a52cf092bec03f3adf63dfdb7c1a2820ab9e214845a0f5eb72" "a5270d86fac30303c5910be7403467662d7601b821af2ff0c4eb181153ebfc0a" "d445c7b530713eac282ecdeea07a8fa59692c83045bf84dd112dd738c7bcad1d" "7422e5b955cf72a2657e0b932ce00efcaee3cffd663f5d701d2442a74ab17dbf" default))
- '(package-selected-packages
-   '(yasnippet ccls flycheck-pos-tip company-box lsp-ivy rainbow-delimiters ivy projectile wgrep-ag multiple-cursors gruvbox-theme dap-mode go-add-tags go-fill-struct lsp-mode web-mode rg rainbow-mode paredit markdown-mode magit htmlize go-mode flymake-shellcheck expand-region emmet-mode))
- '(warning-suppress-types '((use-package))))
-(custom-set-faces
- ;; custom-set-faces was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- )
+(use-package helm-descbinds
+  :ensure t
+  :bind ("C-h b" . helm-descbinds))
+
+(use-package helm-swoop
+:ensure t
+:chords
+("js" . helm-swoop)
+("jp" . helm-swoop-back-to-last-point)
+:init
+(bind-key "M-m" 'helm-swoop-from-isearch isearch-mode-map)
+
+;; If you prefer fuzzy matching
+(setq helm-swoop-use-fuzzy-match t)
+
+;; Save buffer when helm-multi-swoop-edit complete
+(setq helm-multi-swoop-edit-save t)
+
+;; If this value is t, split window inside the current window
+(setq helm-swoop-split-with-multiple-windows nil)
+
+;; Split direction. 'split-window-vertically or 'split-window-horizontally
+(setq helm-swoop-split-direction 'split-window-vertically)
+
+;; If nil, you can slightly boost invoke speed in exchange for text color
+(setq helm-swoop-speed-or-color nil)
+
+;; ;; Go to the opposite side of line from the end or beginning of line
+(setq helm-swoop-move-to-line-cycle t)
+
+)
+
+(use-package yasnippet-snippets :ensure t)
+
+;; Avy
+(use-package avy
+  :ensure t
+  :chords
+  (("jc" . avy-goto-char)
+   ("jw" . avy-goto-word-1)
+   ("jl" . avy-goto-line)))
+
+;; Company
+(use-package company
+  :ensure t)
+
+;; Flycheck
+(use-package flycheck
+  :ensure t
+  :init (global-flycheck-mode))
+
+;; DAP Mode
+(use-package dap-mode
+  :ensure t
+  :after lsp-mode
+  :bind (:map lsp-mode-map
+              ("<f5>" . dap-debug)
+              ("M-<f5>" . dap-hydra))
+  :hook ((dap-mode . dap-ui-mode)
+         (dap-session-created . (lambda (&_rest) (dap-hydra)))
+         (dap-terminated . (lambda (&_rest) (dap-hydra/nil)))))
+
+(use-package dap-java :ensure nil)
+
+;; LSP Mode
+(use-package lsp-mode
+  :ensure t
+  :hook ((java-mode . #'lsp-deferred))
+  :init (setq lsp-keymap-prefix "C-c l"
+              lsp-enable-file-watchers nil
+              read-process-output-max (* 1024 1024)
+              lsp-completion-provider :capf
+              lsp-idle-delay 0.500)
+  :config (define-key lsp-mode-map (kbd "C-c l") lsp-command-map))
+
+;; LSP UI
+(use-package lsp-ui
+  :ensure t
+  :bind (:map lsp-ui-mode-map
+              ([remap xref-find-definitions] . lsp-ui-peek-find-definitions)
+              ([remap xref-find-references] . lsp-ui-peek-find-references))
+  :init (setq lsp-ui-doc-delay 1.5
+              lsp-ui-doc-position 'bottom
+              lsp-ui-doc-max-width 100))
+
+;; Treemacs
+(use-package lsp-treemacs
+  :ensure t
+  :commands lsp-treemacs-errors-list
+  :bind (:map lsp-mode-map
+              ("M-9" . lsp-treemacs-errors-list)))
+
+(use-package treemacs
+  :ensure t
+  :commands (treemacs)
+  :after (lsp-mode))
+
+;; Quickrun
+(use-package quickrun
+  :ensure t
+  :bind ("C-c r" . quickrun))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Appearance & Fonts
+
+;; Theme
+(use-package doom-themes
+  :ensure t
+  :init (load-theme 'doom-palenight t))
+
+;; Font
+(set-face-attribute 'default nil :family "Consolas" :height 140 :weight 'bold)
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Eshell Config
+
+(defun disable-company-in-eshell ()
+  "Disable company-mode in eshell."
+  (company-mode -1))
+
+(add-hook 'eshell-mode-hook 'disable-company-in-eshell)
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Custom Settings
+
+;; Backup em ~/.saves
+(setq backup-directory-alist `(("." . "~/.saves")))
+
+;; Display Date & Time
+(setq display-time-day-and-date t
+      display-time-format "%a %b %d %R"
+      display-time-interval 60
+      display-time-default-load-average nil)
+(display-time)
+
+;; Miscellaneous UI Settings
+(setq inhibit-startup-screen t
+      initial-scratch-message nil
+      ring-bell-function 'ignore
+      cursor-type 'box)
+
+(defalias 'yes-or-no-p 'y-or-n-p)
+(tool-bar-mode -1)
+(scroll-bar-mode -1)
+(tooltip-mode -1)
+(menu-bar-mode -1)
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; End of Configuration
