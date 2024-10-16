@@ -1,43 +1,29 @@
-;; Ensure use-package is available
-(require 'use-package)
+;;; Java Development Setup for Emacs
 
-;; lsp-mode setup for Java development
-(use-package lsp-mode
-	:ensure t
-	:commands (lsp lsp-deferred)
-	:hook (java-mode . lsp-deferred)
-	:init
-	(setq lsp-enable-file-watchers nil)
-	:config
-	;; Specify the path to the language server jar file or script
-	;; This needs to be adjusted according to your specific lsp server setup for Java
-	(setq lsp-java-jdt-download-url "http://download.eclipse.org/jdtls/milestones/latest/")
-	;; Optional: Specify workspace directory
-	(setq lsp-java-workspace-dir "~/.emacs.d/workspace/")
-	;; Optional: If you want to use lombok, specify the path to the lombok jar
-	(setq lsp-java-vmargs
-				(list "-noverify"
-							"-Xmx2G"
-							"-XX:+UseG1GC"
-							"-XX:+UseStringDeduplication"
-							(concat "-javaagent:" (expand-file-name "~/.emacs.d/lombok.jar"))
-							(concat "-Xbootclasspath/a:" (expand-file-name "~/.emacs.d/lombok.jar"))))
-	(setq lsp-java-format-settings-url "https://raw.githubusercontent.com/google/styleguide/gh-pages/eclipse-java-google-style.xml")
-	(setq lsp-java-format-settings-profile "GoogleStyle")
-	;; Enable/disable features
-	(setq lsp-java-save-actions-organize-imports t)
-	(setq lsp-java-autobuild-enabled t))
+;; Carregar lsp-java para habilitar o LSP no java-mode
+(use-package lsp-java
+  :ensure t
+  :config
+  (add-hook 'java-mode-hook 'lsp) ;; Ativa o LSP para Java
+  (setq lsp-java-vmargs
+        '("-XX:+UseG1GC" "-XX:+UseStringDeduplication" "-Xmx2G"))
+  ;; Ajuste o caminho do Java, se necessário
+  ;; (setq lsp-java-java-path "path_to_your_java")
+  (setq lsp-java-save-action-organize-imports t)
+  (setq lsp-java-autobuild-enabled t))
 
-;; lsp-ui for better UI
-(use-package lsp-ui
-	:ensure t
-	:after lsp-mode
-	:commands lsp-ui-mode
-	:config
-	(setq lsp-ui-doc-enable t
-				lsp-ui-doc-position 'top
-				lsp-ui-doc-show-with-cursor t
-				lsp-ui-doc-show-with-mouse nil
-				lsp-ui-sideline-enable t
-				lsp-ui-sideline-show-hover t
-				lsp-ui-sideline-show-code-actions t))
+;; DAP Mode para depuração de Java
+(use-package dap-java
+  :ensure nil
+  :after lsp-java)
+
+;; Funções e atalhos adicionais para LSP e DAP
+(global-set-key (kbd "C-c l d") 'dap-java-debug)          ;; Depurar projeto Java
+(global-set-key (kbd "C-c l D") 'dap-java-debug-test-class) ;; Depurar classe de teste
+(global-set-key (kbd "C-c l M") 'dap-java-debug-test-method) ;; Depurar método de teste
+
+;; Spring Initializer com LSP para criar projetos Spring Boot
+(defun java/spring-initializer ()
+  "Use lsp-java-spring-initializer to create a new Spring Boot project."
+  (interactive)
+  (lsp-java-spring-initializer))
