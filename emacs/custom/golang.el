@@ -19,7 +19,7 @@
   :config
   (setq lsp-ui-doc-enable t
         lsp-ui-doc-position 'top
-        lsp-ui-sideline-enable false)) ;; Configure as needed
+        lsp-ui-sideline-enable nil)) ;; Configure as needed
 
 ;; Company mode for autocompletion
 (use-package company
