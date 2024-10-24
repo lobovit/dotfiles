@@ -237,9 +237,9 @@
 ;; Appearance & Fonts
 
 ;; Theme
-(use-package doom-themes
+(use-package gruvbox-theme
   :ensure t
-  :init (load-theme 'doom-palenight t))
+  :init (load-theme 'gruvbox-dark-soft t))
 
 ;; Font
 (set-face-attribute 'default nil :family "Consolas" :height 140 :weight 'bold)
@@ -286,9 +286,9 @@
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
  '(custom-safe-themes
-   '("51fa6edfd6c8a4defc2681e4c438caf24908854c12ea12a1fbfd4d055a9647a3" "7ec8fd456c0c117c99e3a3b16aaf09ed3fb91879f6601b1ea0eeaee9c6def5d9" "d6b934330450d9de1112cbb7617eaf929244d192c4ffb1b9e6b63ad574784aad" "fa49766f2acb82e0097e7512ae4a1d6f4af4d6f4655a48170d0a00bcb7183970" "e3a1b1fb50e3908e80514de38acbac74be2eb2777fc896e44b54ce44308e5330" "551320837bd87074e3de38733e0a8553618c13f7208eda8ec9633d59a70bc284" "f5f80dd6588e59cfc3ce2f11568ff8296717a938edd448a947f9823a4e282b66" "2ff9ac386eac4dffd77a33e93b0c8236bb376c5a5df62e36d4bfa821d56e4e20" "b6269b0356ed8d9ed55b0dcea10b4e13227b89fd2af4452eee19ac88297b0f99" "88f7ee5594021c60a4a6a1c275614103de8c1435d6d08cc58882f920e0cec65e" "c8b83e7692e77f3e2e46c08177b673da6e41b307805cd1982da9e2ea2e90e6d7" "89c50e934a32921ed51da9fa883484a433f32fbc5cf9780860d13322e23edcde" "e8ceeba381ba723b59a9abc4961f41583112fc7dc0e886d9fc36fa1dc37b4079" "4ade6b630ba8cbab10703b27fd05bb43aaf8a3e5ba8c2dc1ea4a2de5f8d45882" "014cb63097fc7dbda3edf53eb09802237961cbb4c9e9abd705f23b86511b0a69" "7c340289e943a8e1fdd76152014b75a976912caaa93285d9ff9581641166221b" default))
+   '("48042425e84cd92184837e01d0b4fe9f912d875c43021c3bcb7eeb51f1be5710" "75eef60308d7328ed14fa27002e85de255c2342e73275173a14ed3aa1643d545" "e4a702e262c3e3501dfe25091621fe12cd63c7845221687e36a79e17cf3a67e0" "4990532659bb6a285fee01ede3dfa1b1bdf302c5c3c8de9fad9b6bc63a9252f7" "4e2e42e9306813763e2e62f115da71b485458a36e8b4c24e17a2168c45c9cf9d" "51fa6edfd6c8a4defc2681e4c438caf24908854c12ea12a1fbfd4d055a9647a3" "7ec8fd456c0c117c99e3a3b16aaf09ed3fb91879f6601b1ea0eeaee9c6def5d9" "d6b934330450d9de1112cbb7617eaf929244d192c4ffb1b9e6b63ad574784aad" "fa49766f2acb82e0097e7512ae4a1d6f4af4d6f4655a48170d0a00bcb7183970" "e3a1b1fb50e3908e80514de38acbac74be2eb2777fc896e44b54ce44308e5330" "551320837bd87074e3de38733e0a8553618c13f7208eda8ec9633d59a70bc284" "f5f80dd6588e59cfc3ce2f11568ff8296717a938edd448a947f9823a4e282b66" "2ff9ac386eac4dffd77a33e93b0c8236bb376c5a5df62e36d4bfa821d56e4e20" "b6269b0356ed8d9ed55b0dcea10b4e13227b89fd2af4452eee19ac88297b0f99" "88f7ee5594021c60a4a6a1c275614103de8c1435d6d08cc58882f920e0cec65e" "c8b83e7692e77f3e2e46c08177b673da6e41b307805cd1982da9e2ea2e90e6d7" "89c50e934a32921ed51da9fa883484a433f32fbc5cf9780860d13322e23edcde" "e8ceeba381ba723b59a9abc4961f41583112fc7dc0e886d9fc36fa1dc37b4079" "4ade6b630ba8cbab10703b27fd05bb43aaf8a3e5ba8c2dc1ea4a2de5f8d45882" "014cb63097fc7dbda3edf53eb09802237961cbb4c9e9abd705f23b86511b0a69" "7c340289e943a8e1fdd76152014b75a976912caaa93285d9ff9581641166221b" default))
  '(package-selected-packages
-   '(powershell suscolors-theme monokai-pro-theme org-plus-contrib dracula-theme ewal-doom-themes flycheck-rust magit yasnippet-snippets which-key use-package-chords slime rg quickrun python-mode projectile lsp-ui lsp-pyright lsp-javacomp lsp-java lsp-ivy helm-swoop helm-lsp helm-descbinds heaven-and-hell gruvbox-theme go-fill-struct go-add-tags flycheck-pos-tip doom-themes company-box clj-refactor ccls avy-zap)))
+   '(atom-one-dark-theme powershell suscolors-theme monokai-pro-theme org-plus-contrib dracula-theme ewal-doom-themes flycheck-rust magit yasnippet-snippets which-key use-package-chords slime rg quickrun python-mode projectile lsp-ui lsp-pyright lsp-javacomp lsp-java lsp-ivy helm-swoop helm-lsp helm-descbinds heaven-and-hell gruvbox-theme go-fill-struct go-add-tags flycheck-pos-tip doom-themes company-box clj-refactor ccls avy-zap)))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
