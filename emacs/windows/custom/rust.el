@@ -1,11 +1,5 @@
 ;; rust.el - Emacs configuration for Rust LSP server (rust-analyzer)
 
-;; Install the required packages
-(require 'package)
-(unless (package-installed-p 'use-package)
-  (package-refresh-contents)
-  (package-install 'use-package))
-
 ;; Ensure lsp-mode is installed
 (use-package lsp-mode
   :ensure t
@@ -39,5 +33,3 @@
 (use-package cargo
   :ensure t
   :hook (rust-mode . cargo-minor-mode))
-
-(provide 'rust)
