@@ -11,7 +11,23 @@
 
 (unless package-archive-contents (package-refresh-contents))
 
-(setq package-list '(use-package))
+(defvar package-list '(projectile
+		       lsp-treemacs
+		       treemacs
+		       markdown-mode
+		       web-mode
+		       flycheck
+		       company
+		       rainbow-mode
+		       pkgbuild-mode
+		       yaml-mode
+		       powershell
+		       magit
+		       quickrun
+		       counsel-projectile
+		       dumb-jump
+		       ripgrep))
+
 (dolist (package package-list)
   (unless (package-installed-p package)
     (package-install package)))
@@ -24,7 +40,7 @@
 (setq backup-directory-alist `(("." . "~/.saves")))
 
 (setq inhibit-startup-screen t
-      inhibit-scratch-message nil
+      initial-scratch-message nil
       ring-bell-function 'ignore
       cursor-type 'box
       blink-cursor-mode nil
@@ -36,11 +52,17 @@
       line-number-mode t
       column-number-mode t
       select-enable-clipboard t
-      bidi-display-reordering 'left-to-right
-      display-time-day-and-date t
-      display-time-format "%a %b %d %R"
-      display-time-internal 60
-      display-time-default-load-avarage nil)
+      bidi-display-reordering 'left-to-right)
+
+(defvar display-time-format)
+(defvar display-time-interval)
+(defvar display-time-default-load-average)
+
+(display-time-mode 1)
+
+(setq display-time-format "%a %b %d %R"
+      display-time-interval 60
+      display-time-default-load-average nil)
 
 (display-time)
 (add-hook 'before-save-hook 'whitespace-cleanup)
@@ -54,13 +76,12 @@
 (delete-selection-mode 1)
 (column-number-mode t)
 (auto-fill-mode 1)
+
 (defalias 'yes-or-no-p 'y-or-n-p)
 (tool-bar-mode -1)
 (scroll-bar-mode -1)
 (tooltip-mode -1)
 (menu-bar-mode -1)
-
-
 
 (defalias 'yes-or-no-p 'y-or-n-p)
 (tool-bar-mode -1)
@@ -107,11 +128,16 @@
   :bind (:map lsp-mode-map
 	      ("M-9" . lsp-treemacs-errors-list)))
 
-(with-eval-after-load 'treemacs
+(use-package treemacs
+  :ensure t
+  :defer t
+  :init
   (setq treemacs-follow-after-init t)
-  (treemacs-follow-mode t)
-  (treemacs-project-follow-mode t))
-
+  :config
+  (when (fboundp 'treemacs-follow-mode)
+    (treemacs-follow-mode 1))
+  (when (fboundp 'treemacs-project-follow-mode)
+    (treemacs-project-follow-mode 1)))
 
 (use-package treemacs
   :ensure t
@@ -143,14 +169,18 @@
   (("\\.html?\\'" . web-mode)
    ("\\.htm?\\'" . web-mode))
   :config
-  (defun do.misc.web-mode/hooks ()
+  (defun my-web-mode-hooks ()
     "Hooks for Web mode."
     (setq web-mode-markup-indent-offset 2)
     (setq web-mode-css-indent-offset 2)
     (setq-local electric-pair-inhibit-predicate
 		(lambda (c)
-		  (if (char-equal c ?{) t (electric-pair-default-inhibit c)))))
-  (add-hook 'web-mode-hook  #'do.misc.web-mode/hooks))
+		  (if (char-equal c ?{) t
+		    (when (fboundp 'electric-pair-default-inhibit)
+		      (funcall 'electric-pair-default-inhibit c))))))
+    )
+  (add-hook 'web-mode-hook #'my-web-mode-hooks)
+
 
 ;; Flycheck
 (use-package flycheck
