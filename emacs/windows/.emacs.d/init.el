@@ -83,6 +83,71 @@
 (column-number-mode t)
 (auto-fill-mode 1)
 
+;; font type
+(set-face-attribute 'default nil :family "Consolas" :height 152 :weight 'bold)
+
+
+;; hotkey custom ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+(global-set-key (kbd "C-c C-c") 'comment-or-uncomment-region)
+
+;; treemacs keybind
+(global-set-key (kbd "<f5>") 'treemacs)
+
+;; packages keybind
+;; Helm keybindings
+(global-set-key (kbd "M-x") 'helm-M-x)
+(global-set-key (kbd "C-x C-f") 'helm-find-files)
+(global-set-key (kbd "C-x b") 'helm-mini)
+(global-set-key (kbd "C-s") 'helm-occur)
+
+;; Projectile keybindings
+;; First define the prefix key map, then bind individual commands
+(define-key global-map (kbd "C-c p") 'projectile-command-map)
+;; Don't bind these individually as they're already in the command map
+;; (projectile-find-file is bound to 'f' in projectile-command-map)
+;; (projectile-switch-project is bound to 'p' in projectile-command-map)
+;; (projectile-ripgrep is bound to 's r' in projectile-command-map)
+
+;; Magit keybindings
+(global-set-key (kbd "C-x g") 'magit-status)
+(global-set-key (kbd "C-x M-g") 'magit-dispatch)
+
+;; Multiple-cursors keybindings
+(global-set-key (kbd "C-S-c C-S-c") 'mc/edit-lines)
+(global-set-key (kbd "C->") 'mc/mark-next-like-this)
+(global-set-key (kbd "C-<") 'mc/mark-previous-like-this)
+(global-set-key (kbd "C-c C-<") 'mc/mark-all-like-this)
+
+;; LSP mode keybindings
+;; First define the prefix key map
+(define-prefix-command 'lsp-command-map)
+(global-set-key (kbd "C-c l") 'lsp-command-map)
+;; Then bind individual commands to the prefix map
+(define-key lsp-command-map (kbd "r") 'lsp-rename)
+(define-key lsp-command-map (kbd "d") 'lsp-find-definition)
+(define-key lsp-command-map (kbd "a") 'lsp-execute-code-action)
+
+;; Company keybindings
+(global-set-key (kbd "C-<tab>") 'company-complete)
+
+;; Expand-region keybindings
+(global-set-key (kbd "C-=") 'er/expand-region)
+
+;; Dumb-jump keybindings
+(global-set-key (kbd "M-g j") 'dumb-jump-go)
+(global-set-key (kbd "M-g b") 'dumb-jump-back)
+
+;; Ripgrep keybindings
+(global-set-key (kbd "C-c s") 'ripgrep-regexp)
+
+
+
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
 ;; UI simplification
 (defalias 'yes-or-no-p 'y-or-n-p)
 (tool-bar-mode -1)
