@@ -1,25 +1,27 @@
+;; clang.el - Configuration for C/C++ development
+
 ;; lsp-mode configuration
 (use-package lsp-mode
   :ensure t
-  :hook ((c-mode . lsp)
-         (c++-mode . lsp)
+  :hook ((c-mode . lsp-deferred)
+         (c++-mode . lsp-deferred)
          (lsp-mode . lsp-enable-which-key-integration))
-  :commands lsp
+  :commands (lsp lsp-deferred)
   :config
-  (setq lsp-prefer-flymake nil)
-  (setq lsp-enable-on-type-formatting nil)
-  (setq lsp-keymap-prefix "C-c l")
-  (define-key lsp-mode-map (kbd "C-c l") lsp-command-map)
-  (setq lsp-file-watch-threshold 15000))
+  (setq lsp-prefer-flymake nil
+        lsp-enable-on-type-formatting nil
+        lsp-keymap-prefix "C-c l"
+        lsp-file-watch-threshold 15000)
+  (define-key lsp-mode-map (kbd "C-c l") lsp-command-map))
 
 (use-package lsp-ui
   :ensure t
-  :commands (lsp-ui-mode)
+  :commands lsp-ui-mode
   :config
-  (setq lsp-ui-doc-enable nil)
-  (setq lsp-ui-doc-delay 0.5)
-  (define-key lsp-ui-mode-map [remap xref-find-definitions] #'lsp-ui-peek-find-definitions)
-  (define-key lsp-ui-mode-map [remap xref-find-references] #'lsp-ui-peek-find-references))
+  (setq lsp-ui-doc-enable nil
+        lsp-ui-doc-delay 0.5)
+  (define-key lsp-ui-mode-map (kbd "M-.") #'lsp-ui-peek-find-definitions)
+  (define-key lsp-ui-mode-map (kbd "M-?") #'lsp-ui-peek-find-references))
 
 (use-package lsp-ivy
   :ensure t
@@ -32,17 +34,17 @@
 ;; company
 (use-package company
   :ensure t
-  :bind ("M-/" . company-complete-common-or-cycle)
-  :init (add-hook 'after-init-hook 'global-company-mode)
+  :hook (after-init . global-company-mode)
+  :bind ("M-/" . company-complete)
   :config
   (setq company-show-numbers t
         company-minimum-prefix-length 1
         company-idle-delay 0.5
         company-backends '((company-files
-                            company-keywords
-                            company-capf
-                            company-yasnippet)
-                           (company-abbrev company-dabbrev))))
+                           company-keywords
+                           company-capf
+                           company-yasnippet)
+                          (company-abbrev company-dabbrev))))
 
 (use-package company-box
   :ensure t
@@ -55,8 +57,7 @@
   :init (global-flycheck-mode)
   :config
   (setq flycheck-display-errors-function
-  #'flycheck-display-error-messages-unless-error-list)
-
+        #'flycheck-display-error-messages-unless-error-list)
   (setq flycheck-indication-mode nil))
 
 (use-package flycheck-pos-tip
@@ -67,13 +68,13 @@
 
 (use-package ccls
   :ensure t
-  :config
   :hook ((c-mode c++-mode objc-mode cuda-mode) .
          (lambda () (require 'ccls) (lsp)))
-  (setq ccls-executable "/usr/local/bin/ccls")
-  (setq ccls-args nil)
-  (setq ccls-initialization-options
-  '(:index (:comments 2) :completion (:detailedLabel t))))
+  :config
+  (setq ccls-executable "/usr/local/bin/ccls"
+        ccls-args nil
+        ccls-initialization-options
+        '(:index (:comments 2) :completion (:detailedLabel t))))
 
 (defun create-c-project (project-name)
   "Create a new C project structure and generate a .ccls file in the project root."
@@ -101,13 +102,18 @@
   "Set up gmake as the compile command for the current buffer."
   (interactive)
   (set (make-local-variable 'compile-command)
-       (concat "gmake "  ; Directly using 'gmake'
+       (concat "gmake "
                (if buffer-file-name
                    (shell-quote-argument
                     (file-name-sans-extension buffer-file-name))
-                 "all")))  ; Default to 'gmake all' if no buffer file name is available
-
-
+                 "all"))))
 
 ;; Apply the keybindings when entering c-mode
+(defun setup-c-mode-compile-keybindings ()
+  "Set up keybindings for C mode compilation."
+  (local-set-key (kbd "C-c c") 'cc))
+
 (add-hook 'c-mode-hook 'setup-c-mode-compile-keybindings)
+
+(provide 'clang)
+;;; clang.el ends here
