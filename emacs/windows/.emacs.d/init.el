@@ -1,23 +1,41 @@
-;;; Code
+;;; init.el --- Emacs configuration -*- lexical-binding: t -*-
 
-(defvar dotfiles-dir (expand-file-name "~/.emacs.d"))
+;;; Commentary:
+;;; Configuração do Emacs para Windows
 
+;;; Code:
+
+;; Package Management (keep this at the top)
+(require 'package)
+(add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/") t)
+(add-to-list 'package-archives '("gnu" . "https://elpa.gnu.org/packages/") t)
+
+;; Bootstrap use-package
+(unless (package-installed-p 'use-package)
+  (package-refresh-contents)
+  (package-install 'use-package))
+
+(require 'use-package)
+(setq use-package-always-ensure t)
+
+(setq debug-on-warning t)
+
+(defvar dotfiles-dir (expand-file-name "site-lisp" "C:\\Users\\lobor\\AppData\\Roaming\\.emacs.d"))
 
 (defun lobo-require-packages (packages)
-    (dolist (package packages)
+  (dolist (package packages)
     (when (not (package-installed-p package))
-        (package-install package))))
+      (package-install package))))
 
 (defun lobo-recentf-ido-find-file ()
-    "Find a recent file using ido."
-    (interactive)
-    (let ((file (ido-completing-read "Choose recent file: " recentf-list nil t)))
+  "Encontra um arquivo recente usando ido."
+  (interactive)
+  (let ((file (ido-completing-read "Escolha um arquivo recente: " recentf-list nil t)))
     (when file
-        (find-file file))))
-
+      (find-file file))))
 
 (defun custom-isearch-toggle ()
-  "Toggle between isearch-forward and isearch-backward."
+  "Alternar entre isearch-forward e isearch-backward."
   (interactive)
   (if (eq isearch-forward t)
       (progn
@@ -27,49 +45,49 @@
       (isearch-exit)
       (isearch-forward))))
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; Key Bindings
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Vinculação de Chaves
 
 (global-set-key (kbd "C-x f") 'lobo-recentf-ido-find-file)
 
-;; Exiting
-;; The mnemonic is C-x REALLY QUIT
+;; Saindo
+;; O acrônimo é C-x REALLY QUIT
 (global-set-key (kbd "C-x r q") 'save-buffers-kill-terminal)
 ;(global-set-key (kbd "C-x C-c") 'delete-frame)
 
-;; Personal key bindings config
+;; Configuração personalizada de chaves
 
-;; Save files
+;; Salvar arquivos
 (global-set-key (kbd "C-s") 'save-buffer)
 
 ;; Ctrl + a para selecionar tudo
 (global-set-key (kbd "C-a") 'mark-whole-buffer)
 
-;; search
+;; Pesquisa
 (global-set-key (kbd "C-f") 'custom-isearch-toggle)
 
-;; Paste
+;; Colar
 (global-set-key (kbd "C-v") 'yank)
 
-;; Cut
+;; Cortar
 (global-set-key (kbd "C-S-x") 'kill-region)
 
-;; Replace
+;; Substituir
 (global-set-key (kbd "C-r") 'query-replace)
 
-;; undo
+;; Desfazer
 (global-set-key (kbd "C-z") 'undo)
 
-;; redo
+;; Refazer
 (global-set-key (kbd "C-S-z") 'undo-redo)
 
-
-;; Reload emacs config
+;; Recarregar configuração do Emacs
 (global-set-key [f5] 'eval-buffer)
 (global-set-key [f6] 'dired)
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; Global modes
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Global Modes
 
 (require 'ansi-color)
 (require 'recentf)
@@ -104,19 +122,30 @@
 
 (global-set-key (kbd "<f7>") 'projectile-compile-project)
 
+;; utf8
+(set-language-environment "UTF-8")
+(prefer-coding-system 'utf-8)
+(set-default-coding-systems 'utf-8)
+(set-terminal-coding-system 'utf-8)
+(set-keyboard-coding-system 'utf-8)
+(set-buffer-file-coding-system 'utf-8)
+(setq-default buffer-file-coding-system 'utf-8)
+
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Custom Settings
 
-;; backup in .saves directory
+;; backup in.saves directory
 (setq backup-directory-alist `(("." . "~/.saves")))
 
-;; force bash with my shell
-(defvar my-term-shell "/usr/local/bin/bash")
-(defadvice ansi-term (before force-bash)
-    (interactive (list my-term-shell)))
-(ad-activate 'ansi-term)
+;; open gitbash Mingw64
+(defun mingw64-shell ()
+  "Open Git Bash (Mingw64) in a new window."
+  (interactive)
+  (start-process "" nil "C:\\Program Files\\Git\\bin\\bash.exe" "--login" "-i"))
 
-(global-set-key (kbd "<s-return>") 'ansi-term)
+;; keybindings ctrl + x + t
+(global-set-key (kbd "<s-return>") 'mingw64-shell)
 
 (column-number-mode t)
 ;(custom-file (concat user-emacs-directory "custom.el"))
@@ -176,7 +205,7 @@
 (setq-default bidi-display-reordering 'left-to-right)
 
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Mode-line
 
 ;; Remove all minor modes (mode-line-modes)
@@ -203,7 +232,6 @@
         display-time-default-load-average nil)
 (display-time)
 
-
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; UI
 
@@ -222,40 +250,41 @@
 (blink-cursor-mode -1)
 
 (defalias 'yes-or-no-p 'y-or-n-p)
-(if (fboundp 'tool-bar-mode) (tool-bar-mode -1))
-(if (fboundp 'scroll-bar-mode) (scroll-bar-mode -1))
-(if (fboundp 'tooltip-mode) (tooltip-mode -1))
-(if (fboundp 'menu-bar-mode) (menu-bar-mode -1))
-(if (fboundp 'x-cut-buffer-or-selection-value)
-    (setq x-select-enable-clipboard t
-            interprogram-paste-function 'x-cut-buffer-or-selection-value))
+(when (fboundp 'tool-bar-mode) (tool-bar-mode -1))
+(when (fboundp 'scroll-bar-mode) (scroll-bar-mode -1))
+(when (fboundp 'tooltip-mode) (tooltip-mode -1))
+(when (fboundp 'menu-bar-mode) (menu-bar-mode -1))
+(when (fboundp 'x-cut-buffer-or-selection-value)
+  (setq x-select-enable-clipboard t
+        interprogram-paste-function 'x-cut-buffer-or-selection-value))
+
 (condition-case exc
     (progn
-        (add-to-list 'custom-theme-load-path
-                     (concat user-emacs-directory "themes"))
-        (if window-system
-            (progn
-            (mouse-wheel-mode t)
-            (blink-cursor-mode 1)
-            (add-to-list 'default-frame-alist '(height . 40))
-            (add-to-list 'default-frame-alist '(width . 100))
-            ;; fonts
-            (let ((myfont "Inconsolata-16:weight=bold"))
-                (set-frame-font myfont)
-                (add-to-list 'default-frame-alist (cons 'font myfont)))
-            ;; themes
-            (load-theme 'gruvbox-dark-hard t))
-        (if (string= (getenv "TERM") "xterm-256color")
-            (load-theme 'gruvbox-dark-hard t)
-            (load-theme 'tango dark t))))
-    ('error
-     (warn (format "Caught exception: [%s]" exc))))
+      (add-to-list 'custom-theme-load-path
+                   (concat user-emacs-directory "themes"))
+      (when window-system
+        (mouse-wheel-mode t)
+        (blink-cursor-mode 1)
+        (add-to-list 'default-frame-alist '(height . 40))
+        (add-to-list 'default-frame-alist '(width . 100))
+        ;; fonts
+        (let ((myfont "Martian mono cn bd-14")
+              (fallback-font "Consolas Bold-14"))
+          (if (member myfont (font-family-list))
+              (set-frame-font myfont)
+            (set-frame-font fallback-font))
+          (add-to-list 'default-frame-alist (cons 'font (frame-parameter nil 'font)))))
+      ;; Load default theme
+      (load-theme 'tango-dark t))
+  (error
+   (warn (format "Caught exception: [%s]" exc))))
+
 (delete 'try-expand-line hippie-expand-try-functions-list)
 (delete 'try-expand-list hippie-expand-try-functions-list)
 (add-to-list 'completion-ignored-extensions ".d")  ;; "cc -MD" depends files
 (add-to-list 'completion-ignored-extensions ".test")
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Initialization
 
 (random t)
@@ -279,19 +308,49 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Package Management
 
-(require 'package)
-(package-initialize)
-
+;; Add MELPA repository
 (add-to-list 'package-archives
              '("melpa" . "https://melpa.org/packages/") t)
+(add-to-list 'package-archives
+             '("gnu" . "https://elpa.gnu.org/packages/") t)
 
-;; Ensure use-package is installed
-(when (not (package-installed-p 'use-package))
-    (package-refresh-contents)
-    (package-install 'use-package))
+;; Initialize package system
+(package-initialize)
 
-(eval-when-compile
-    (require 'use-package))
+;; Bootstrap use-package
+(unless (package-installed-p 'use-package)
+  (package-refresh-contents)
+  (package-install 'use-package))
+
+(require 'use-package)
+(setq use-package-always-ensure t)
+
+;; Keep the core package configurations
+(use-package spinner
+  :ensure t)
+
+(use-package company
+  :ensure t
+  :hook (prog-mode . company-mode)
+  :config
+  (setq company-minimum-prefix-length 1
+        company-idle-delay 0.0))
+
+(use-package lsp-mode
+  :ensure t
+  :init
+  (setq lsp-keymap-prefix "C-c l")
+  :hook ((prog-mode . lsp-deferred))
+  :commands (lsp lsp-deferred))
+
+(use-package lsp-ui
+  :ensure t
+  :after lsp-mode
+  :commands lsp-ui-mode
+  :custom
+  (lsp-ui-doc-enable t)
+  (lsp-ui-doc-position 'bottom)
+  (lsp-ui-sideline-enable t))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;; Rgrep
@@ -306,7 +365,7 @@
     :format literal
     :confirm prefix
     :files "everything"
-    :flags ("--hidden -g !.git")
+    :flags ("--hidden -g!.git")
     :dir (if (vc-root-dir)
              (vc-root-dir)
              default-directory))
@@ -316,24 +375,31 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; CUSTOM LANGS
 
-;; load custom langs *.el files
-(dolist (file (directory-files (expand-file-name "custom" user-emacs-directory) t "\\.el$"))
-    (load file))
+;; Ensure core packages are loaded first
+(use-package flycheck
+  :ensure t
+  :diminish
+  :init
+  (global-flycheck-mode))
 
-(custom-set-variables
- ;; custom-set-variables was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- '(custom-enabled-themes '(gruvbox-dark-hard))
- '(custom-safe-themes
-   '("a5270d86fac30303c5910be7403467662d7601b821af2ff0c4eb181153ebfc0a" "d445c7b530713eac282ecdeea07a8fa59692c83045bf84dd112dd738c7bcad1d" "7422e5b955cf72a2657e0b932ce00efcaee3cffd663f5d701d2442a74ab17dbf" default))
- '(package-selected-packages
-   '(yasnippet ccls flycheck-pos-tip company-box lsp-ivy rainbow-delimiters ivy projectile wgrep-ag multiple-cursors gruvbox-theme dap-mode go-add-tags go-fill-struct lsp-mode web-mode rg rainbow-mode paredit markdown-mode magit htmlize go-mode flymake-shellcheck expand-region emmet-mode))
- '(warning-suppress-types '((use-package))))
-(custom-set-faces
- ;; custom-set-faces was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- )
+(use-package slime-company
+  :ensure t
+  :after (slime company))
+
+;; load custom langs *.el files
+(let ((custom-dir (expand-file-name "custom" user-emacs-directory)))
+  ;; Create custom directory if it doesn't exist
+  (unless (file-directory-p custom-dir)
+    (make-directory custom-dir t))
+  ;; Load all .el files from custom directory
+  (dolist (file (directory-files custom-dir t "\\.el$"))
+    (load-file file)))
+
+;; Set up custom file early
+(setq custom-file (expand-file-name "custom.el" user-emacs-directory))
+(unless (file-exists-p custom-file)
+  (write-region "" nil custom-file))
+(load custom-file)
+
+(provide 'init)
+;;; init.el ends here
