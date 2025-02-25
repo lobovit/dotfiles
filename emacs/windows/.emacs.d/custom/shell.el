@@ -30,7 +30,7 @@
   (setq lsp-ui-doc-enable t
         lsp-ui-doc-position 'top
         lsp-ui-doc-include-signature t
-        lsp-ui-sideline-enable false))
+        lsp-ui-sideline-enable nil))
 
 ;; Install and configure bash-language-server for lsp-mode
 ;; Ensure you have bash-language-server installed on your system:

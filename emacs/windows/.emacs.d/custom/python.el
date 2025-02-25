@@ -20,19 +20,14 @@
 ;; Optional: Use-package for better package management
 (use-package python-mode
   :ensure t
-  :hook (python-mode . lsp-deferred)
-  :config
-  (setq python-indent-offset 4))
+  :hook (python-mode . lsp-deferred) ; Enable lsp in python-mode
+  ;; Additional Python mode settings can go here
+  )
 
 ;; Additional configuration for LSP UI (optional but recommended for better UX)
 (use-package lsp-ui
   :ensure t
-  :after lsp-mode
-  :commands lsp-ui-mode
-  :config
-  (setq lsp-ui-doc-enable t
-        lsp-ui-peek-enable t
-        lsp-ui-sideline-enable t))
+  :commands lsp-ui-mode)
 
 ;; Finalizes the configuration of python.el
 (provide 'python)

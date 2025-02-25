@@ -1,3 +1,15 @@
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Basic package manager
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(require 'package)
+
+(setq package-archives '(("melpa" . "https://melpa.org/packages/")
+			 ("elpa" . "https://elpa.gnu.org/packages/")
+			 ("org" . "https://orgmode.org/elpa/")))
+(package-initialize)
+
+(unless package-archive-contents (package-refresh-contents))
 ;;; init.el --- Emacs configuration -*- lexical-binding: t -*-
 
 ;;; Commentary:
@@ -27,284 +39,230 @@
     (when (not (package-installed-p package))
       (package-install package))))
 
-(defun lobo-recentf-ido-find-file ()
-  "Encontra um arquivo recente usando ido."
-  (interactive)
-  (let ((file (ido-completing-read "Escolha um arquivo recente: " recentf-list nil t)))
-    (when file
-      (find-file file))))
+(defvar package-list '(projectile
+		       lsp-treemacs
+		       treemacs
+		       markdown-mode
+		       web-mode
+		       flycheck
+		       company
+		       rainbow-mode
+		       pkgbuild-mode
+		       yaml-mode
+		       powershell
+		       magit
+		       quickrun
+		       counsel-projectile
+		       dumb-jump
+		       ripgrep))
 
-(defun custom-isearch-toggle ()
-  "Alternar entre isearch-forward e isearch-backward."
-  (interactive)
-  (if (eq isearch-forward t)
-      (progn
-        (isearch-exit)
-        (isearch-backward))
-    (progn
-      (isearch-exit)
-      (isearch-forward))))
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; Vinculação de Chaves
-
-(global-set-key (kbd "C-x f") 'lobo-recentf-ido-find-file)
-
-;; Saindo
-;; O acrônimo é C-x REALLY QUIT
-(global-set-key (kbd "C-x r q") 'save-buffers-kill-terminal)
-;(global-set-key (kbd "C-x C-c") 'delete-frame)
-
-;; Configuração personalizada de chaves
-
-;; Salvar arquivos
-(global-set-key (kbd "C-s") 'save-buffer)
-
-;; Ctrl + a para selecionar tudo
-(global-set-key (kbd "C-a") 'mark-whole-buffer)
-
-;; Pesquisa
-(global-set-key (kbd "C-f") 'custom-isearch-toggle)
-
-;; Colar
-(global-set-key (kbd "C-v") 'yank)
-
-;; Cortar
-(global-set-key (kbd "C-S-x") 'kill-region)
-
-;; Substituir
-(global-set-key (kbd "C-r") 'query-replace)
-
-;; Desfazer
-(global-set-key (kbd "C-z") 'undo)
-
-;; Refazer
-(global-set-key (kbd "C-S-z") 'undo-redo)
-
-;; Recarregar configuração do Emacs
-(global-set-key [f5] 'eval-buffer)
-(global-set-key [f6] 'dired)
+(dolist (package package-list)
+  (unless (package-installed-p package)
+    (package-install package)))
 
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; Global Modes
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Basic config
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(require 'ansi-color)
-(require 'recentf)
-(require 'ffap)
-(require 'uniquify)
+(setq backup-directory-alist `(("." . "~/.saves")))
 
+(setq inhibit-startup-screen t
+      initial-scratch-message nil
+      ring-bell-function 'ignore
+      cursor-type 'box
+      blink-cursor-mode nil
+      create-lockfiles nil
+      save-interprogram-paste-before-kill nil
+      select-enable-primary nil
+      electric-pair-mode 1
+      electric-indent-mode 1
+      line-number-mode t
+      column-number-mode t
+      select-enable-clipboard t
+      bidi-display-reordering 'left-to-right)
+
+(defvar display-time-format)
+(defvar display-time-interval)
+(defvar display-time-default-load-average)
+
+(display-time-mode 1)
+
+(setq display-time-format "%a %b %d %R"
+      display-time-interval 60
+      display-time-default-load-average nil)
+
+(display-time)
+(add-hook 'before-save-hook 'whitespace-cleanup)
 (auto-compression-mode t)
-(auto-fill-mode 1)
-(delete-selection-mode 1)
-(global-font-lock-mode t)
-;(global-whitespace-mode 1)
-
-;; Line Numbers
 (global-display-line-numbers-mode t)
-
-;; Navigate sillycased words
+(global-font-lock-mode t)
 (global-subword-mode 1)
-
-(ido-mode t)
 (recentf-mode 1)
 (show-paren-mode 1)
 (global-visual-line-mode 1)
-
-;;;;;;;;;;;;;;;;;;;;;;;
-;;; projectile
-;;;;;;;;;;;;;;;;;;;;;;
-
-(use-package projectile
-    :ensure t
-    :init
-    (projectile-mode 1))
-
-(global-set-key (kbd "<f7>") 'projectile-compile-project)
-
-;; utf8
-(set-language-environment "UTF-8")
-(prefer-coding-system 'utf-8)
-(set-default-coding-systems 'utf-8)
-(set-terminal-coding-system 'utf-8)
-(set-keyboard-coding-system 'utf-8)
-(set-buffer-file-coding-system 'utf-8)
-(setq-default buffer-file-coding-system 'utf-8)
-
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; Custom Settings
-
-;; backup in.saves directory
-(setq backup-directory-alist `(("." . "~/.saves")))
-
-;; open gitbash Mingw64
-(defun mingw64-shell ()
-  "Open Git Bash (Mingw64) in a new window."
-  (interactive)
-  (start-process "" nil "C:\\Program Files\\Git\\bin\\bash.exe" "--login" "-i"))
-
-;; keybindings ctrl + x + t
-(global-set-key (kbd "<s-return>") 'mingw64-shell)
-
-(column-number-mode t)
-;(custom-file (concat user-emacs-directory "custom.el"))
-
-(indent-tabs-mode nil)
-
-;; When on a tab, make the cursor the tab length…
-(setq-default x-stretch-cursor t)
-
-;; But never insert tabs…
-(set-default 'indent-tabs-mode nil)
-
-;; Except in Makefiles.
-(add-hook 'makefile-mode-hook 'indent-tabs-mode)
-
-;; Keep files clean.
-(setq-default require-final-newline t)
-
-(setq-default show-trailing-whitespace t)
-(add-hook 'before-save-hook 'whitespace-cleanup)
-
-;; Don't write lock-files
-(setq create-lockfiles nil)
-
-;; Fix empty clipboard error
-(setq save-interprogram-paste-before-kill nil)
-
-;; Remove text in active region if inserting text
 (delete-selection-mode 1)
-
-;; Don't automatically copy selected text
-(setq select-enable-primary nil)
-
-;; Auto-close brackets and double quotes
-(electric-pair-mode 1)
-
-;; Don't automatically indent lines
-(electric-indent-mode 1)
-
-;; Always display line and column numbers
-(setq line-number-mode t)
-(setq column-number-mode t)
-
-;; Word wrap (t is no wrap, nil is wrap)
-(setq-default truncate-lines nil)
-
-;; Don't use shift to mark things.
-;(setq shift-select-mode nil)
-
-;; Allow clipboard from outside emacs
-(setq select-enable-clipboard t
-        save-interprogram-paste-before-kill t
-        apropos-do-all t
-        mouse-yank-at-point t)
-
-;; Improve performance of very long lines
-(setq-default bidi-display-reordering 'left-to-right)
-
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; Mode-line
-
-;; Remove all minor modes (mode-line-modes)
-(setq-default mode-line-format
-        '("%e"
-        mode-line-front-space
-        mode-line-mule-info
-        mode-line-client
-        mode-line-modified
-        mode-line-remote
-        mode-line-frame-identification
-        mode-line-buffer-identification
-        "    "
-        mode-line-position
-        (vc-mode vc-mode)
-        " (" mode-name ") "
-        mode-line-misc-info
-        mode-line-end-spaces))
-
-;; Add Date
-(setq display-time-day-and-date t
-        display-time-format "%a %b %d %R"
-        display-time-interval 60
-        display-time-default-load-average nil)
-(display-time)
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; UI
-
-;; inhibit emacs initial messages
-(setq inhibit-startup-screen t)
-(setq initial-scratch-message nil)
-
-;; No alarms.
-(setq ring-bell-function 'ignore)
-
-;; Productive default mode.
-;(setq initial-major-mode 'org-mode)
-
-;; Change cursor.
-(setq-default cursor-type 'box)
-(blink-cursor-mode -1)
+(column-number-mode t)
+(auto-fill-mode 1)
 
 (defalias 'yes-or-no-p 'y-or-n-p)
-(when (fboundp 'tool-bar-mode) (tool-bar-mode -1))
-(when (fboundp 'scroll-bar-mode) (scroll-bar-mode -1))
-(when (fboundp 'tooltip-mode) (tooltip-mode -1))
-(when (fboundp 'menu-bar-mode) (menu-bar-mode -1))
-(when (fboundp 'x-cut-buffer-or-selection-value)
-  (setq x-select-enable-clipboard t
-        interprogram-paste-function 'x-cut-buffer-or-selection-value))
+(tool-bar-mode -1)
+(scroll-bar-mode -1)
+(tooltip-mode -1)
+(menu-bar-mode -1)
 
-(condition-case exc
-    (progn
-      (add-to-list 'custom-theme-load-path
-                   (concat user-emacs-directory "themes"))
-      (when window-system
-        (mouse-wheel-mode t)
-        (blink-cursor-mode 1)
-        (add-to-list 'default-frame-alist '(height . 40))
-        (add-to-list 'default-frame-alist '(width . 100))
-        ;; fonts
-        (let ((myfont "Martian mono cn bd-14")
-              (fallback-font "Consolas Bold-14"))
-          (if (member myfont (font-family-list))
-              (set-frame-font myfont)
-            (set-frame-font fallback-font))
-          (add-to-list 'default-frame-alist (cons 'font (frame-parameter nil 'font)))))
-      ;; Load default theme
-      (load-theme 'tango-dark t))
-  (error
-   (warn (format "Caught exception: [%s]" exc))))
+(defalias 'yes-or-no-p 'y-or-n-p)
+(tool-bar-mode -1)
+(scroll-bar-mode -1)
+(tooltip-mode -1)
+(menu-bar-mode -1)
 
-(delete 'try-expand-line hippie-expand-try-functions-list)
-(delete 'try-expand-list hippie-expand-try-functions-list)
-(add-to-list 'completion-ignored-extensions ".d")  ;; "cc -MD" depends files
-(add-to-list 'completion-ignored-extensions ".test")
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; Initialization
+;; Theme
+(use-package tangotango-theme
+  :ensure t
+  :init (load-theme 'tangotango t))
 
-(random t)
-;(add-to-list 'load-path (concat dotfiles-dir "lisp"))
-(setq locale-coding-system 'utf-8)
-(set-terminal-coding-system 'utf-8)
-(set-keyboard-coding-system 'utf-8)
-(set-selection-coding-system 'utf-8)
-(prefer-coding-system 'utf-8)
+;; Font
+(set-face-attribute 'default nil :family "Consolas" :height 152 :weight 'bold)
 
-(setq-default
- c-basic-offset 2
- c-file-style nil
- coffee-tab-width 2
- css-indent-offset 2
- fill-column 80
- save-place t
- tab-width 2
- truncate-lines t)
 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Personal custom hotkeys config
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(global-set-key [f2] 'eval-buffer)
+(global-set-key [f6] 'dired)
+(global-set-key [f4] 'treemacs)
+
+
+;; Eshell Config
+
+(defun disable-company-in-eshell ()
+  "Disable company-mode in eshell."
+  (company-mode -1))
+
+(add-hook 'eshell-mode-hook 'disable-company-in-eshell)
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Plugins
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+;; Treemacs
+(use-package lsp-treemacs
+  :ensure t
+  :commands lsp-treemacs-errors-list
+  :bind (:map lsp-mode-map
+	      ("M-9" . lsp-treemacs-errors-list)))
+
+(use-package treemacs
+  :ensure t
+  :defer t
+  :init
+  (setq treemacs-follow-after-init t)
+  :config
+  (when (fboundp 'treemacs-follow-mode)
+    (treemacs-follow-mode 1))
+  (when (fboundp 'treemacs-project-follow-mode)
+    (treemacs-project-follow-mode 1)))
+
+(use-package treemacs
+  :ensure t
+  :commands (treemacs)
+  :after (lsp-mode))
+
+;; Markdown
+(use-package markdown-mode
+  :ensure t
+  :commands
+  (markdown-mode gfm-mode)
+  :bind (:map markdown-mode-map ("C-<tab>" . yas-expand))
+  :mode
+  (("README\\.md\\'" . gfm-mode)
+   ("\\.md\\'" . markdown-mode)
+   ("\\.text\\'" . markdown-mode)
+   ("\\.markdown\\'" . markdown-mode))
+  :init
+  (setq markdown-command "markdown")
+  :config
+  (add-hook 'markdown-mode-hook (lambda () (auto-fill-mode t)))
+  (add-hook 'markdown-mode-hook 'flyspell-mode))
+
+;; HTML
+
+(use-package web-mode
+  :ensure t
+  :mode
+  (("\\.html?\\'" . web-mode)
+   ("\\.htm?\\'" . web-mode))
+  :config
+  (defun my-web-mode-hooks ()
+    "Hooks for Web mode."
+    (setq web-mode-markup-indent-offset 2)
+    (setq web-mode-css-indent-offset 2)
+    (setq-local electric-pair-inhibit-predicate
+		(lambda (c)
+		  (if (char-equal c ?{) t
+		    (when (fboundp 'electric-pair-default-inhibit)
+		      (funcall 'electric-pair-default-inhibit c))))))
+    )
+  (add-hook 'web-mode-hook #'my-web-mode-hooks)
+
+
+;; Flycheck
+(use-package flycheck
+  :ensure t
+  :init (global-flycheck-mode))
+
+;; Company
+(use-package company
+  :ensure t)
+
+;; Rainbow-mode
+(use-package rainbow-mode
+  :ensure t)
+
+;; Pkgbuild
+(use-package pkgbuild-mode
+  :ensure t
+  :mode "PKGBUILD")
+
+;; YAML
+(use-package yaml-mode
+  :defer t
+  :ensure t
+  :mode (("\\.yml$" . yaml-mode)
+	 ("\\.yaml$" . yaml-mode)))
+
+;; Powershell
+(use-package powershell
+  :ensure t)
+
+;; Unfill paragraph
+(defun unfill-paragraph ()
+  (interactive)
+  (let ((fill-column (point-max)))
+    (fill-paragraph nil)))
+
+(defun unfill-region ()
+  (interactive)
+  (let ((fill-column (point-max)))
+    (fill-region (region-beginning) (region-end) nil)))
+
+;; Magit
+(use-package magit
+  :ensure t
+  :bind (("C-x g" . magit-status)))
+
+;; Company
+(use-package company
+  :ensure t)
+
+;; Flycheck
+(use-package flycheck
+  :ensure t
+  :init (global-flycheck-mode))
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Package Management
 
@@ -317,89 +275,47 @@
 ;; Initialize package system
 (package-initialize)
 
-;; Bootstrap use-package
-(unless (package-installed-p 'use-package)
-  (package-refresh-contents)
-  (package-install 'use-package))
+;; Quickrun
+(use-package quickrun
+  :ensure t
+  :bind ("C-c r" . quickrun))
 
-(require 'use-package)
-(setq use-package-always-ensure t)
+;; Projectile
+(use-package projectile
+  :ensure t
+  :config
+  (projectile-mode +1)
+  (setq projectile-completion-system 'ivy))
+(define-key projectile-mode-map (kbd "C-c p") 'projectile-command-map)
 
-;; Keep the core package configurations
-(use-package spinner
+(use-package counsel-projectile
+  :ensure t
+  :config
+  (counsel-projectile-mode))
+
+(use-package dumb-jump
+  :ensure t
+  :config
+  (setq dumb-jump-selector 'ivy) ;; ou 'helm, se preferir o Helm
+  ;; Ativa o dumb-jump como backend do xref para navegação entre definições
+  (add-hook 'xref-backend-functions #'dumb-jump-xref-activate))
+
+;; Ripgrep
+(use-package ripgrep
   :ensure t)
 
-(use-package company
-  :ensure t
-  :hook (prog-mode . company-mode)
-  :config
-  (setq company-minimum-prefix-length 1
-        company-idle-delay 0.0))
 
-(use-package lsp-mode
-  :ensure t
-  :init
-  (setq lsp-keymap-prefix "C-c l")
-  :hook ((prog-mode . lsp-deferred))
-  :commands (lsp lsp-deferred))
-
-(use-package lsp-ui
-  :ensure t
-  :after lsp-mode
-  :commands lsp-ui-mode
-  :custom
-  (lsp-ui-doc-enable t)
-  (lsp-ui-doc-position 'bottom)
-  (lsp-ui-sideline-enable t))
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;;;; Rgrep
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-(use-package rg
-    :ensure t
-    :config
-    (rg-define-search my/rg-project
-    "Search for any files in project or current directory"
-    :query ask
-    :format literal
-    :confirm prefix
-    :files "everything"
-    :flags ("--hidden -g!.git")
-    :dir (if (vc-root-dir)
-             (vc-root-dir)
-             default-directory))
-    :bind
-    ("C-S-h" . my/rg-project))
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; CUSTOM LANGS
-
-;; Ensure core packages are loaded first
-(use-package flycheck
-  :ensure t
-  :diminish
-  :init
-  (global-flycheck-mode))
-
-(use-package slime-company
-  :ensure t
-  :after (slime company))
-
-;; load custom langs *.el files
-(let ((custom-dir (expand-file-name "custom" user-emacs-directory)))
-  ;; Create custom directory if it doesn't exist
-  (unless (file-directory-p custom-dir)
-    (make-directory custom-dir t))
-  ;; Load all .el files from custom directory
-  (dolist (file (directory-files custom-dir t "\\.el$"))
-    (load-file file)))
-
-;; Set up custom file early
-(setq custom-file (expand-file-name "custom.el" user-emacs-directory))
-(unless (file-exists-p custom-file)
-  (write-region "" nil custom-file))
-(load custom-file)
-
-(provide 'init)
-;;; init.el ends here
+(custom-set-variables
+ ;; custom-set-variables was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ '(package-selected-packages
+   '(dumber-jump counsel-projectile projectile quickrun flycheck magit powershell yaml-mode pkgbuild-mode rainbow-mode slime-company web-mode highlight-indent-guides lsp-treemacs tangotango-theme)))
+(custom-set-faces
+ ;; custom-set-faces was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ )
+(put 'upcase-region 'disabled nil)

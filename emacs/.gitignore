@@ -12,3 +12,4 @@ windows/.emacs.d/ido.last
 windows/.emacs.d/transient/
 windows/.emacs.d/projectile-bookmarks.eld
 windows/.config/
+windows/.gitconfig

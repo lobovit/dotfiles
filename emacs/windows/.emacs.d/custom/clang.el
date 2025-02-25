@@ -1,22 +1,20 @@
-;; clang.el
-
 ;; lsp-mode configuration
 (use-package lsp-mode
   :ensure t
-  :hook ((c-mode . lsp-deferred)
-         (c++-mode . lsp-deferred)
+  :hook ((c-mode . lsp)
+         (c++-mode . lsp)
          (lsp-mode . lsp-enable-which-key-integration))
-  :commands (lsp lsp-deferred)
+  :commands lsp
   :config
-  (setq lsp-prefer-flymake nil
-        lsp-enable-on-type-formatting nil
-        lsp-keymap-prefix "C-c l"
-        lsp-file-watch-threshold 15000)
-  (define-key lsp-mode-map (kbd "C-c l") lsp-command-map))
+  (setq lsp-prefer-flymake nil)
+  (setq lsp-enable-on-type-formatting nil)
+  (setq lsp-keymap-prefix "C-c l")
+  (define-key lsp-mode-map (kbd "C-c l") lsp-command-map)
+  (setq lsp-file-watch-threshold 15000))
 
 (use-package lsp-ui
   :ensure t
-  :commands lsp-ui-mode
+  :commands (lsp-ui-mode)
   :config
   (setq lsp-ui-doc-enable nil)
   (setq lsp-ui-doc-delay 0.5)
@@ -34,18 +32,17 @@
 ;; company
 (use-package company
   :ensure t
-  :hook (after-init . global-company-mode)
-  :bind ("M-/" . company-complete)
+  :bind ("M-/" . company-complete-common-or-cycle)
+  :init (add-hook 'after-init-hook 'global-company-mode)
   :config
   (setq company-show-numbers t
         company-minimum-prefix-length 1
-        company-idle-delay 0.5)
-  (setq company-backends
-        '((company-files
-           company-keywords
-           company-capf
-           company-yasnippet)
-          (company-abbrev company-dabbrev))))
+        company-idle-delay 0.5
+        company-backends '((company-files
+                            company-keywords
+                            company-capf
+                            company-yasnippet)
+                           (company-abbrev company-dabbrev))))
 
 (use-package company-box
   :ensure t
@@ -57,8 +54,10 @@
   :ensure t
   :init (global-flycheck-mode)
   :config
-  (setq flycheck-display-errors-function #'flycheck-display-error-messages-unless-error-list
-        flycheck-indication-mode nil))
+  (setq flycheck-display-errors-function
+  #'flycheck-display-error-messages-unless-error-list)
+
+  (setq flycheck-indication-mode nil))
 
 (use-package flycheck-pos-tip
   :ensure t
@@ -66,15 +65,15 @@
   :config
   (flycheck-pos-tip-mode))
 
-;; ccls configuration
 (use-package ccls
   :ensure t
-  :hook ((c-mode c++-mode objc-mode cuda-mode) . lsp)
   :config
-  (setq ccls-executable "C:/path/to/ccls.exe")  ;; Atualize este caminho
+  :hook ((c-mode c++-mode objc-mode cuda-mode) .
+         (lambda () (require 'ccls) (lsp)))
+  (setq ccls-executable "/usr/local/bin/ccls")
   (setq ccls-args nil)
   (setq ccls-initialization-options
-        '(:index (:comments 2) :completion (:detailedLabel t))))
+  '(:index (:comments 2) :completion (:detailedLabel t))))
 
 (defun create-c-project (project-name)
   "Create a new C project structure and generate a .ccls file in the project root."
@@ -102,14 +101,13 @@
   "Set up gmake as the compile command for the current buffer."
   (interactive)
   (set (make-local-variable 'compile-command)
-       (concat "gmake "
+       (concat "gmake "  ; Directly using 'gmake'
                (if buffer-file-name
                    (shell-quote-argument
                     (file-name-sans-extension buffer-file-name))
-                 "all"))))
+                 "all")))  ; Default to 'gmake all' if no buffer file name is available
+
+
 
 ;; Apply the keybindings when entering c-mode
-(defun setup-c-mode-compile-keybindings ()
-  (local-set-key (kbd "C-c c") 'cc))
-
 (add-hook 'c-mode-hook 'setup-c-mode-compile-keybindings)
