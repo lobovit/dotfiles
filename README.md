@@ -81,18 +81,49 @@ This repository contains my personal configuration files for Emacs, FreeBSD, Lin
 
 ### C/C++
 - `C-c c` - Set up compilation command for C files
+- LSP integration with clangd/ccls
+- Flycheck for syntax checking
+- Project creation with `create-c-project`
 
 ### Go
 - Auto-formatting on save
 - Import management with goimports
+- LSP integration with gopls
+- Struct manipulation with go-fill-struct and go-add-tags
 
 ### Python
 - LSP integration with pyright
 - Auto-completion and documentation
+- Syntax checking with Flycheck
 
 ### Java
 - LSP integration with Eclipse JDT
 - Debugging support with DAP mode
+- Spring Boot project creation with `java/spring-initializer`
+
+### Clojure
+- CIDER integration for REPL-driven development
+- LSP support with clojure-lsp
+- Paredit for structural editing
+
+### Rust
+- LSP integration with rust-analyzer
+- Cargo commands integration
+- Auto-formatting on save
+
+### Common Lisp
+- SLIME integration for REPL interaction
+- LSP support
+- Paredit for structural editing
+
+### Shell/Bash
+- LSP integration with bash-language-server
+- Syntax checking with shellcheck
+
+### Web Development
+- HTML/CSS/JS/JSX/TSX support with web-mode
+- Emmet for HTML expansion
+- CSS color preview with rainbow-mode
 
 ## Miscellaneous
 
