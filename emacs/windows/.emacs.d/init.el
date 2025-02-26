@@ -108,11 +108,8 @@
 (global-set-key (kbd "C-c s") 'ripgrep-regexp)
 
 ;; Shell keybindings
-(global-set-key (kbd "C-c e") 'eshell) 
-(global-set-key (kbd "C-c h") 'shell)
-(global-set-key (kbd "C-c t") 'term)
-(when (fboundp 'vterm)
-  (global-set-key (kbd "C-c v") 'vterm))
+;;(global-set-key (kbd "C-c e") 'vterm) 
+
 
 ;; Load all custom configuration files
 (let ((custom-dir (expand-file-name "custom" user-emacs-directory)))
