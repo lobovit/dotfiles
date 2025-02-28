@@ -17,12 +17,31 @@
   ;; You can also configure per-project interpreters with .dir-locals.el
   (setq lsp-pyright-python-executable-cmd "python3"))
 
-;; Optional: Use-package for better package management
-(use-package python-mode
-  :ensure t
-  :hook (python-mode . lsp-deferred) ; Enable lsp in python-mode
-  ;; Additional Python mode settings can go here
-  )
+;; Use python-mode package instead of built-in python.el to avoid warnings
+(use-package python
+  :ensure nil  ;; Já vem com o Emacs
+  :mode ("\\.py\\'" . python-mode)
+  :hook (python-mode . lsp-deferred)
+  :config
+  ;; Define funções que estão gerando warnings
+  (unless (fboundp 'python-indent)
+    (defun python-indent ()
+      "Indent current line as Python code."
+      (interactive)
+      (indent-line-to (python-indent-calculate-indentation))))
+  
+  (unless (fboundp 'python-info-ppss-context)
+    (defun python-info-ppss-context (type &optional syntax-ppss)
+      "Return non-nil if point is on TYPE using SYNTAX-PPSS.
+TYPE can be 'comment, 'string or 'paren."
+      (let ((ppss (or syntax-ppss (syntax-ppss))))
+        (cond ((eq type 'comment)
+               (nth 4 ppss))
+              ((eq type 'string)
+               (nth 3 ppss))
+              ((eq type 'paren)
+               (nth 1 ppss))
+              (t nil))))))
 
 ;; Additional configuration for LSP UI (optional but recommended for better UX)
 (use-package lsp-ui
