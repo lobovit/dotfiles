@@ -412,6 +412,37 @@ TYPE can be 'comment, 'string or 'paren."
   :config
   (setq slime-company-completion 'fuzzy))
 
+;; C/C++ - configuração central
+(use-package ccls
+  :ensure t
+  :defer t
+  :config
+  (setq ccls-executable "/usr/local/bin/ccls"
+        ccls-args nil
+        ccls-initialization-options
+        '(:index (:comments 2) :completion (:detailedLabel t))))
+
+;; Company Box - para melhor visualização de completions
+(use-package company-box
+  :ensure t
+  :after company
+  :if (display-graphic-p)  ;; Só carregar em modo gráfico
+  :hook (company-mode . company-box-mode)
+  :config
+  (setq company-box-icons-alist 'company-box-icons-all-the-icons))
+
+;; Flycheck Pos-tip - para melhor visualização de erros
+(use-package flycheck-pos-tip
+  :ensure t
+  :after flycheck
+  :config
+  (flycheck-pos-tip-mode))
+
+;; LSP Treemacs - integração do LSP com Treemacs
+(use-package lsp-treemacs
+  :ensure t
+  :commands lsp-treemacs-errors-list)
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; FERRAMENTAS DE DESENVOLVIMENTO
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;

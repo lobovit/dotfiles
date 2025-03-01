@@ -6,11 +6,6 @@
 
 ;;; Code:
 
-;; Suprimir a maioria dos avisos de compilação
-(setq byte-compile-warnings '(not obsolete free-vars unresolved callargs
-                                 redefine docstrings not noruntime cl-functions
-                                 interactive-only))
-
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; INICIALIZAÇÃO BÁSICA
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
