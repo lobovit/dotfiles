@@ -1,35 +1,28 @@
-;; rust.el - Emacs configuration for Rust LSP server (rust-analyzer)
+;;; rust.el --- Configuração para desenvolvimento em Rust -*- lexical-binding: t -*-
 
-;; Ensure lsp-mode is installed
-(use-package lsp-mode
-  :ensure t
-  :hook ((rust-mode . lsp))  ;; Enable LSP for Rust files
-  :commands lsp
-  :config
-  ;; Customize the behavior of lsp-mode
-  (setq lsp-prefer-flymake nil)  ;; Use lsp-ui instead of flymake
-  (setq lsp-rust-server 'rust-analyzer))
+;;; Commentary:
+;; Configurações específicas para desenvolvimento em Rust
 
-;; Optionally, install and configure lsp-ui for better visuals
-(use-package lsp-ui
-  :ensure t
-  :commands lsp-ui-mode)
+;;; Code:
 
-;; Optionally, install company for autocompletion
-(use-package company
-  :ensure t
-  :config
-  (setq company-idle-delay 0.1)
-  (setq company-minimum-prefix-length 1)
-  :hook ((rust-mode . company-mode)))
+;; Hooks específicos para Rust
+(add-hook 'rust-mode-hook 'lsp-deferred)
 
-;; Rust-mode setup
-(use-package rust-mode
-  :ensure t
-  :mode "\\.rs\\'"
-  :hook (rust-mode . lsp))
+;; Configurações específicas para LSP com Rust
+(with-eval-after-load 'lsp-mode
+  ;; Adicionar configuração de ID de linguagem para Rust
+  (add-to-list 'lsp-language-id-configuration '(rust-mode . "rust"))
+  
+  ;; Configurações específicas para rust-analyzer
+  (setq lsp-rust-analyzer-cargo-watch-command "clippy"
+        lsp-rust-analyzer-proc-macro-enable t
+        lsp-rust-analyzer-cargo-load-out-dirs-from-check t))
 
-;; Keybindings for rust-mode
-(use-package cargo
-  :ensure t
-  :hook (rust-mode . cargo-minor-mode))
+;; Keybindings específicos para Rust
+(with-eval-after-load 'rust-mode
+  (define-key rust-mode-map (kbd "C-c C-c") 'cargo-process-run)
+  (define-key rust-mode-map (kbd "C-c C-t") 'cargo-process-test)
+  (define-key rust-mode-map (kbd "C-c C-b") 'cargo-process-build))
+
+(provide 'rust)
+;;; rust.el ends here

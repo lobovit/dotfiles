@@ -1,52 +1,15 @@
-;;; custom.el --- Custom settings -*- lexical-binding: t -*-
+;;; custom.el --- Configurações customizadas do Emacs -*- lexical-binding: t -*-
 
 ;;; Commentary:
-;; Configurações personalizadas do Emacs organizadas por categorias
+;; Este arquivo contém configurações customizadas para o Emacs,
+;; incluindo pacotes, modos, atalhos e variáveis.
 
 ;;; Code:
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; APARÊNCIA E INTERFACE
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-;; Configuração da fonte
-(set-face-attribute 'default nil :family "Consolas" :height 152 :weight 'bold)
-
-;; Simplificação da UI
-(defalias 'yes-or-no-p 'y-or-n-p)                ;; Simplificar a função yes-or-no-p
-(tool-bar-mode -1)                               ;; Desativar a barra de ferramentas
-(scroll-bar-mode -1)                             ;; Desativar a barra de rolagem
-(tooltip-mode -1)                                ;; Desativar os tooltips
-(menu-bar-mode -1)                               ;; Desativar a barra de menus
-
-;; Configurações de exibição de tempo
-(setq display-time-format "%a %b %d %R"          ;; Formato de exibição de tempo
-      display-time-interval 60                   ;; Intervalo de atualização em segundos
-      display-time-default-load-average nil)     ;; Não exibir o load average
-(display-time-mode 1)                            ;; Ativar o modo de exibição de tempo
-
-;; Exibição de linhas e colunas
-(global-display-line-numbers-mode t)             ;; Exibir números de linha
-(line-number-mode t)                             ;; Exibir números de linha
-(column-number-mode t)                           ;; Exibir números de coluna
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; COMPORTAMENTO BÁSICO
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-;; Configurações de inicialização
-(setq inhibit-startup-screen t                   ;; Não exibir a tela de inicialização
-      initial-scratch-message nil)               ;; Não exibir a mensagem do scratch buffer
-
-;; Configurações de cursor e edição
-(setq cursor-type 'box                           ;; Tipo de cursor
-      blink-cursor-mode nil                      ;; Não piscar o cursor
-      create-lockfiles nil                       ;; Não criar arquivos de bloqueio
-      save-interprogram-paste-before-kill nil    ;; Não salvar o conteúdo colado
-      select-enable-primary nil                  ;; Não usar o primary selection
-      select-enable-clipboard t                  ;; Ativar o clipboard
-      ring-bell-function 'ignore                 ;; Não emitir um som de alerta
-      bidi-display-reordering 'left-to-right)    ;; Reordenar texto da esquerda para a direita
 
 ;; Modos de edição
 (electric-pair-mode 1)                           ;; Ativar o modo de par de elétrons
@@ -63,34 +26,199 @@
 (recentf-mode 1)                                 ;; Ativar o modo de recentes
 (show-paren-mode 1)                              ;; Ativar o modo de parênteses
 
+;; Configurações de rolagem e navegação
+(setq scroll-error-top-bottom t)                 ;; Melhor comportamento de rolagem
+(setq scroll-conservatively 101)                 ;; Evitar saltos na rolagem
+(setq scroll-margin 2)                           ;; Manter algumas linhas visíveis ao rolar
+(setq next-line-add-newlines nil)                ;; Não adicionar novas linhas ao final do buffer
+
+;; Configurações de marcas
+(setq set-mark-command-repeat-pop t)             ;; Permitir C-u C-SPC para voltar na marca
+(setq mark-ring-max 16)                          ;; Aumentar o tamanho do anel de marcas
+(setq global-mark-ring-max 32)                   ;; Aumentar o tamanho do anel global de marcas
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; INTERFACE CLEAN
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+;; Inibir a tela inicial
+(setq inhibit-startup-screen t
+  initial-scratch-message nil)
+
+;; Configuração de cursor e edição
+(setq cursor-type 'box
+  blink-cursor-mode nil
+  create-lockfiles nil
+  save-interprogram-paste-before-kill nil
+  select-enable-clipboard t
+  ring-bell-function 'ignore
+)
+
+
+;; Configuração de fonte, barra de rolagem e menu
+(set-face-attribute 'default nil :font "Consolas" :height 152 :weight 'bold)
+(tool-bar-mode -1)
+(scroll-bar-mode -1)
+(menu-bar-mode -1)
+(tooltip-mode -1)
+
+
+;; Configuração de exibição do tempo
+(setq display-time-format "%a %b %d %R"
+      display-time-interval 60
+      display-time-default-load-average nil)
+(display-time-mode 1)
+
+
+;; Exibição de colunas
+(global-display-line-numbers-mode t)
+(line-number-mode t)
+(column-number-mode t)
+
+
+;; Modos globais
+(add-hook 'before-save-hook 'whitespace-cleanup)
+(auto-compression-mode t)
+(global-font-lock-mode t)
+(recentf-mode 1)
+(show-paren-mode 1)
+
+
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; PACOTES ESSENCIAIS
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+;; Configuração básica do Emacs
+(use-package emacs
+  :ensure nil
+  :config
+  ;; Desativar a tela inicial
+  (setq inhibit-startup-screen t)
+  ;; Desativar menus e barras
+  (menu-bar-mode -1)
+  (tool-bar-mode -1)
+  (scroll-bar-mode -1)
+  ;; Mostrar números de linha
+  (global-display-line-numbers-mode t)
+  ;; Destacar a linha atual
+  (global-hl-line-mode t)
+  ;; Configurações de backup
+  (setq backup-directory-alist '(("." . "~/.emacs.d/backups")))
+  (setq auto-save-file-name-transforms '((".*" "~/.emacs.d/auto-save-list/" t)))
+  (setq create-lockfiles nil)
+  ;; Codificação UTF-8
+  (set-language-environment "UTF-8")
+  (set-default-coding-systems 'utf-8)
+  ;; Melhorar a performance
+  (setq gc-cons-threshold 100000000)
+  (setq read-process-output-max (* 1024 1024)))
 
 ;; Bibliotecas de compatibilidade
 (use-package cl-lib
   :ensure t)
 
-;; Ivy para completação
-(use-package ivy
+;; Interface e navegação
+(use-package treemacs
+  :ensure t
+  :defer t
+  :config
+  (setq treemacs-persist-file nil)               ;; Não persistir o estado do treemacs
+  (setq treemacs-width 35)                       ;; Largura da janela do treemacs
+  (setq treemacs-indentation 2)                  ;; Indentação
+  (treemacs-follow-mode t)                       ;; Seguir o buffer atual
+  (treemacs-filewatch-mode t)                    ;; Observar mudanças nos arquivos
+  :bind
+  (:map global-map
+	("<f5>" . treemacs-select-window)))
+
+
+
+;; Ajuda e documentação
+(use-package which-key
   :ensure t
   :config
-  (ivy-mode 1)
-  (setq ivy-use-virtual-buffers t
-	ivy-count-format "%d/%d "))
+  (which-key-mode)
+  (setq which-key-idle-delay 0.5))
 
-;; Counsel para comandos melhorados
-(use-package counsel
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; DESENVOLVIMENTO GERAL
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+;; LSP Mode - configuração central
+(use-package lsp-mode
   :ensure t
-  :after ivy
+  :commands (lsp lsp-deferred)
   :config
-  (counsel-mode 1))
+  (setq lsp-prefer-flymake nil
+	lsp-enable-on-type-formatting nil
+	lsp-keymap-prefix "C-c l"
+	lsp-file-watch-threshold 15000
+	lsp-enable-symbol-highlighting t
+	lsp-enable-indentation t
+	;; Desativar mensagens de servidor não encontrado
+	lsp-auto-guess-root t
+	lsp-warn-no-matched-clients nil
+	lsp-enable-suggest-server-download nil)  ;; Esta é a configuração chave
+  (define-key lsp-mode-map (kbd "C-c l") lsp-command-map))
+
+;; LSP UI - configuração central
+(use-package lsp-ui
+  :ensure t
+  :commands lsp-ui-mode
+  :after lsp-mode
+  :config
+  (setq lsp-ui-doc-enable t
+	lsp-ui-doc-delay 0.5
+	lsp-ui-peek-enable t
+	lsp-ui-sideline-enable t)
+  (define-key lsp-ui-mode-map (kbd "M-.") #'lsp-ui-peek-find-definitions)
+  (define-key lsp-ui-mode-map (kbd "M-?") #'lsp-ui-peek-find-references))
+
+;; Flycheck para verificação de código
+(use-package flycheck
+  :ensure t
+  :init (global-flycheck-mode))
+
+;; Company para autocompleção
+(use-package company
+  :ensure t
+  :config
+  (global-company-mode)
+  (setq company-idle-delay 0.5
+	company-minimum-prefix-length 3
+	company-show-numbers nil))
+
+;; DAP Mode para depuração
+(use-package dap-mode
+  :ensure t
+  :after lsp-mode
+  :config
+  (dap-auto-configure-mode))
+
+;; Ferramentas de edição avançada
+(use-package multiple-cursors
+  :ensure t
+  :bind
+  (("C-S-c C-S-c" . mc/edit-lines)
+   ("C->" . mc/mark-next-like-this)
+   ("C-<" . mc/mark-previous-like-this)
+   ("C-c C-<" . mc/mark-all-like-this)))
+
+(use-package expand-region
+  :ensure t
+  :bind
+  (("C-=" . er/expand-region)))
+
+;; Rainbow-mode para colorização
+(use-package rainbow-mode
+  :ensure t)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; DESENVOLVIMENTO E EDIÇÃO
+;; SUPORTE A LINGUAGENS ESPECÍFICAS
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-;; Web mode
+;; Web e Markup
 (use-package web-mode
   :ensure t
   :mode (("\\.html?\\'" . web-mode)
@@ -115,45 +243,30 @@
 				      (when (fboundp 'electric-pair-default-inhibit)
 					(funcall 'electric-pair-default-inhibit c))))))))
 
-;; Flycheck para verificação de código
-(use-package flycheck
+;; Markdown
+(use-package markdown-mode
   :ensure t
-  :init (global-flycheck-mode))
-
-;; Company para autocompleção
-(use-package company
-  :ensure t
-  :config
-  (global-company-mode))
-
-;; Rainbow-mode para colorização
-(use-package rainbow-mode
-  :ensure t)
-
-;; Multiple-cursors para edição múltipla
-(use-package multiple-cursors
-  :ensure t
-  :bind
-  (("C-S-c C-S-c" . mc/edit-lines)
-   ("C->" . mc/mark-next-like-this)
-   ("C-<" . mc/mark-previous-like-this)
-   ("C-c C-<" . mc/mark-all-like-this)))
-
-;; Expand-region para seleção semântica
-(use-package expand-region
-  :ensure t
-  :bind
-  (("C-=" . er/expand-region)))
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; SUPORTE A LINGUAGENS
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+  :mode (("README\\.md\\'" . gfm-mode)
+	 ("\\.md\\'" . markdown-mode)
+	 ("\\.markdown\\'" . markdown-mode)))
 
 ;; YAML
 (use-package yaml-mode
   :ensure t
   :mode (("\\.yml\\'" . yaml-mode)
-	 ("\\.yaml\\'" . yaml-mode)))
+	 ("\\.yaml\\'" . yaml-mode))
+  :config
+  ;; Definir a variável yaml-indent-offset para evitar warning
+  (defvar yaml-indent-offset 2
+    "Número de espaços para indentação em arquivos YAML.")
+
+  ;; Definir a função yaml-indent para evitar warning
+  (unless (fboundp 'yaml-indent)
+    (defun yaml-indent ()
+      "Indent current line as YAML code."
+      (interactive)
+      (let ((indent (+ (current-indentation) yaml-indent-offset)))
+	(indent-line-to indent)))))
 
 ;; Powershell
 (use-package powershell
@@ -164,12 +277,140 @@
   :ensure t
   :mode "PKGBUILD")
 
-;; Markdown
-(use-package markdown-mode
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; LINGUAGENS DE PROGRAMAÇÃO
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+;; Python
+(use-package python
+  :ensure nil  ;; Já vem com o Emacs
+  :mode ("\\.py\\'" . python-mode)
+  :config
+  ;; Define funções que estão gerando warnings
+  (unless (fboundp 'python-indent)
+    (defun python-indent ()
+      "Indent current line as Python code."
+      (interactive)
+      (indent-line-to (python-indent-calculate-indentation))))
+
+  (unless (fboundp 'python-info-ppss-context)
+    (defun python-info-ppss-context (type &optional syntax-ppss)
+      "Return non-nil if point is on TYPE using SYNTAX-PPSS.
+TYPE can be 'comment, 'string or 'paren."
+      (let ((ppss (or syntax-ppss (syntax-ppss))))
+	(cond ((eq type 'comment)
+	       (nth 4 ppss))
+	      ((eq type 'string)
+	       (nth 3 ppss))
+	      ((eq type 'paren)
+	       (nth 1 ppss))
+	      (t nil))))))
+
+;; LSP-Pyright - configuração central
+(use-package lsp-pyright
   :ensure t
-  :mode (("README\\.md\\'" . gfm-mode)
-	 ("\\.md\\'" . markdown-mode)
-	 ("\\.markdown\\'" . markdown-mode)))
+  :defer t
+  :init
+  (setq lsp-pyright-python-executable-cmd "python3"))
+
+;; Go
+(use-package go-mode
+  :ensure t
+  :defer t
+  :config
+  ;; Escapar aspas simples nas docstrings
+  (with-eval-after-load 'go-mode
+    ;; Corrigir docstrings com aspas simples
+    (put 'go-command 'variable-documentation
+	 (replace-regexp-in-string "'" "\\\\=" (get 'go-command 'variable-documentation)))
+    (put 'gofmt-command 'variable-documentation
+	 (replace-regexp-in-string "'" "\\\\=" (get 'gofmt-command 'variable-documentation)))
+    (put 'godef-command 'variable-documentation
+	 (replace-regexp-in-string "'" "\\\\=" (get 'godef-command 'variable-documentation)))
+    (put 'go-packages-function 'variable-documentation
+	 (replace-regexp-in-string "'" "\\\\=" (get 'go-packages-function 'variable-documentation))))
+
+  (setq gofmt-command "goimports")
+  (add-hook 'before-save-hook 'gofmt-before-save))
+
+;; Go Fill Struct - preencher structs automaticamente
+(use-package go-fill-struct
+  :ensure t
+  :after go-mode)
+
+;; Go Add Tags - adicionar tags a structs
+(use-package go-add-tags
+  :ensure t
+  :after go-mode)
+
+;; Rust
+(use-package rust-mode
+  :ensure t
+  :defer t
+  :config
+  (setq rust-format-on-save t))
+
+;; Cargo - configuração central para Rust
+(use-package cargo
+  :ensure t
+  :after rust-mode
+  :hook (rust-mode . cargo-minor-mode))
+
+;; Java
+(use-package lsp-java
+  :ensure t
+  :defer t
+  :config
+  (setq lsp-java-vmargs
+	'("-XX:+UseG1GC" "-XX:+UseStringDeduplication" "-Xmx2G"))
+  ;; Ajuste o caminho do Java, se necessário
+  ;; (setq lsp-java-java-path "path_to_your_java")
+  (setq lsp-java-save-action-organize-imports t)
+  (setq lsp-java-autobuild-enabled t))
+
+;; DAP Java - configuração específica para Java
+(use-package dap-java
+  :ensure nil  ;; Parte do dap-mode
+  :after (dap-mode lsp-java))
+
+;; Clojure
+(use-package clojure-mode
+  :ensure t
+  :defer t)
+
+;; CIDER - configuração central para Clojure
+(use-package cider
+  :ensure t
+  :after clojure-mode
+  :config
+  ;; Remove a mensagem de boas-vindas do REPL
+  (setq cider-repl-display-help-banner nil)
+  ;; Controla como o buffer do REPL é exibido
+  (setq cider-repl-pop-to-buffer-on-connect 'display-only)
+  ;; Salva o buffer ao compilar ou carregar código
+  (setq cider-save-file-on-load t)
+  ;; Usa pretty-print no REPL
+  (setq cider-repl-use-pretty-printing t)
+  ;; Configura o histórico do REPL
+  (setq cider-repl-wrap-history t)
+  (setq cider-repl-history-size 1000)
+  (setq cider-repl-history-file "~/.emacs.d/cider-history"))
+
+;; Common Lisp
+(use-package slime
+  :ensure t
+  :defer t
+  :init
+  (setq inferior-lisp-program "sbcl")
+  :config
+  (slime-setup '(slime-fancy slime-company)))
+
+;; SLIME Company - configuração central
+(use-package slime-company
+  :ensure t
+  :after (slime company)
+  :config
+  (setq slime-company-completion 'fuzzy))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; FERRAMENTAS DE DESENVOLVIMENTO
@@ -186,15 +427,6 @@
   :ensure t
   :bind ("C-c r" . quickrun))
 
-;; Dumb-jump para navegação de código
-(use-package dumb-jump
-  :ensure t
-  :bind (("M-g j" . dumb-jump-go)
-	 ("M-g b" . dumb-jump-back))
-  :config
-  (setq dumb-jump-selector 'ivy)
-  (add-hook 'xref-backend-functions #'dumb-jump-xref-activate))
-
 ;; Ripgrep para busca de texto
 (use-package ripgrep
   :ensure t
@@ -202,6 +434,20 @@
   :custom
   (ripgrep-highlight-search t
    "Highlight search term in results."))
+
+;; XTerm Color - para melhor suporte a cores no shell
+(use-package xterm-color
+  :ensure t
+  :config
+  (setq comint-output-filter-functions
+	(remove 'ansi-color-process-output comint-output-filter-functions))
+  (add-hook 'comint-preoutput-filter-functions 'xterm-color-filter)
+  (setq ansi-color-for-comint-mode nil))
+
+;; Configuração do smerge-mode para merge de mudanças
+(use-package smerge-mode
+  :ensure nil                                    ;; Já vem com o Emacs
+  :hook (prog-mode . smerge-mode))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; CONFIGURAÇÃO DO SHELL MSYS2
@@ -266,6 +512,9 @@
 (setq comint-prompt-read-only nil)               ;; Não tornar o prompt de comando somente leitura
 (setq comint-process-echoes nil)                 ;; Não exibir mensagens de processamento
 (setq shell-command-switch "-c")                 ;; Usar o switch "-c" para comandos shell
+(setq comint-scroll-to-bottom-on-input t)        ;; Rolar para o final ao inserir texto
+(setq comint-scroll-to-bottom-on-output t)       ;; Rolar para o final ao receber saída
+(setq comint-move-point-for-output t)            ;; Mover o ponto para a saída
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; INTEGRAÇÕES COM IA
@@ -295,13 +544,8 @@
   (("C-c a" . elysium-query)                     ;; Atalho principal para fazer queries
    ("C-c C-a" . elysium-toggle-window)))         ;; Alternar janela do Elysium
 
-;; Configuração do smerge-mode para merge de mudanças
-(use-package smerge-mode
-  :ensure nil                                    ;; Já vem com o Emacs
-  :hook (prog-mode . smerge-mode))
-
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; ATALHOS DE TECLADO ADICIONAIS
+;; ATALHOS CUSTOMIZADOS
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;; Comentar/descomentar região selecionada
@@ -310,6 +554,9 @@
 ;; LSP mode
 (define-prefix-command 'lsp-command-map)
 (global-set-key (kbd "C-c l") 'lsp-command-map)
+
+;; Não persistir o treemacs
+(setq treemacs-persist-file nil)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; VARIÁVEIS CUSTOMIZADAS
@@ -325,7 +572,7 @@
  '(custom-safe-themes
    '("0971e976bc1092a52cf092bec03f3adf63dfdb7c1a2820ab9e214845a0f5eb72" "a5270d86fac30303c5910be7403467662d7601b821af2ff0c4eb181153ebfc0a" "d445c7b530713eac282ecdeea07a8fa59692c83045bf84dd112dd738c7bcad1d" "7422e5b955cf72a2657e0b932ce00efcaee3cffd663f5d701d2442a74ab17dbf" default))
  '(package-selected-packages
-   '(elysium gptel xterm-color ripgrep dumb-jump quickrun powershell yaml-mode pkgbuild-mode cargo rust-mode yasnippet ccls flycheck-pos-tip company-box lsp-ivy rainbow-delimiters ivy wgrep-ag multiple-cursors dap-mode go-add-tags go-fill-struct lsp-mode web-mode rg rainbow-mode paredit markdown-mode magit htmlize go-mode flymake-shellcheck expand-region emmet-mode)))
+   '()))
 
 (custom-set-faces
  ;; custom-set-faces was added by Custom.

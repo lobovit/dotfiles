@@ -6,6 +6,11 @@
 
 ;;; Code:
 
+;; Suprimir a maioria dos avisos de compilação
+(setq byte-compile-warnings '(not obsolete free-vars unresolved callargs
+                                 redefine docstrings not noruntime cl-functions
+                                 interactive-only))
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; INICIALIZAÇÃO BÁSICA
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -45,10 +50,10 @@
 ;; Repositórios de pacotes com fallback
 (setq package-archives
       '(("gnu" . "https://elpa.gnu.org/packages/")
-        ("nongnu" . "https://elpa.nongnu.org/nongnu/")
-        ("melpa" . "https://melpa.org/packages/")
-        ("melpa-stable" . "https://stable.melpa.org/packages/")
-        ("org" . "https://orgmode.org/elpa/")))
+	("nongnu" . "https://elpa.nongnu.org/nongnu/")
+	("melpa" . "https://melpa.org/packages/")
+	("melpa-stable" . "https://stable.melpa.org/packages/")
+	("org" . "https://orgmode.org/elpa/")))
 
 ;; Inicializa o sistema de pacotes
 (package-initialize)
@@ -82,9 +87,9 @@ Toma uma lista de nomes de pacotes e garante que eles estão instalados."
   (dolist (package packages)
     (unless (package-installed-p package)
       (condition-case nil
-          (package-install package)
-        (error
-         (message "Couldn't install %s" package))))))
+	  (package-install package)
+	(error
+	 (message "Couldn't install %s" package))))))
 
 ;; Funções para descompactar parágrafos
 (defun unfill-paragraph ()
@@ -99,6 +104,32 @@ Toma uma lista de nomes de pacotes e garante que eles estão instalados."
   (interactive)
   (let ((fill-column (point-max)))
     (fill-region (region-beginning) (region-end) nil)))
+
+;; Função para evitar erros de minibuffer recursivo
+(defun safe-minibuffer-eval (function &rest args)
+  "Execute FUNCTION with ARGS only if not in minibuffer."
+  (unless (minibufferp)
+    (apply function args)))
+
+;; Melhorar o advice para o timer-event-handler
+(defadvice timer-event-handler (around no-recursive-minibuffer activate)
+  "Prevent timer from using minibuffer when it's active."
+  (unless (active-minibuffer-window)
+    ad-do-it))
+
+;; Desativar timers problemáticos
+(defun disable-problematic-timers ()
+  "Disable timers that might cause minibuffer issues."
+  (dolist (timer timer-list)
+    (let ((fn (timer--function timer)))
+      (when (and (symbolp fn)
+                 (or (string-match-p "company" (symbol-name fn))
+                     (string-match-p "flycheck" (symbol-name fn))
+                     (string-match-p "lsp" (symbol-name fn))))
+        (cancel-timer timer)))))
+
+;; Executar após inicialização
+(add-hook 'after-init-hook 'disable-problematic-timers)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; CARREGAMENTO DE CONFIGURAÇÕES
@@ -119,124 +150,10 @@ Toma uma lista de nomes de pacotes e garante que eles estão instalados."
     (dolist (file (directory-files custom-dir t "\\.el$"))
       (load-file file))))
 
-;; Tenta instalar pacotes essenciais
-(ensure-package-installed 'counsel 'ivy)
-
 ;; Usar funções modernas do xref
 (with-eval-after-load 'etags
   (define-obsolete-variable-alias 'find-tag-marker-ring 'xref-marker-stack "25.1"))
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; DESENVOLVIMENTO E EDIÇÃO
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-;; Web mode
-(use-package web-mode
-  :ensure t
-  :mode (("\\.html?\\'" . web-mode)
-         ("\\.tsx\\'" . web-mode)
-         ("\\.jsx\\'" . web-mode)
-         ("\\.css\\'" . web-mode)
-         ("\\.scss\\'" . web-mode)
-         ("\\.php\\'" . web-mode))
-  :config
-  (setq web-mode-markup-indent-offset 2)
-  (setq web-mode-css-indent-offset 2)
-  (setq web-mode-code-indent-offset 2)
-  (setq web-mode-enable-auto-pairing t)
-  (setq web-mode-enable-css-colorization t)
-  (setq web-mode-enable-current-element-highlight t)
-  :hook (web-mode . (lambda ()
-                      (setq web-mode-markup-indent-offset 2)
-                      (setq web-mode-css-indent-offset 2)
-                      (setq-local electric-pair-inhibit-predicate
-                                  (lambda (c)
-                                    (if (char-equal c ?{) t
-                                      (when (fboundp 'electric-pair-default-inhibit)
-                                        (funcall 'electric-pair-default-inhibit c))))))))
-
-;; Flycheck para verificação de código
-(use-package flycheck
-  :ensure t
-  :init (global-flycheck-mode))
-
-;; Company para autocompleção
-(use-package company
-  :ensure t
-  :config
-  (global-company-mode))
-
-;; Rainbow-mode para colorização
-(use-package rainbow-mode
-  :ensure t)
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; SUPORTE A LINGUAGENS
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-;; YAML
-(use-package yaml-mode
-  :ensure t
-  :mode (("\\.yml\\'" . yaml-mode)
-         ("\\.yaml\\'" . yaml-mode)))
-
-;; Powershell
-(use-package powershell
-  :ensure t)
-
-;; Pkgbuild para Arch Linux
-(use-package pkgbuild-mode
-  :ensure t
-  :mode "PKGBUILD")
-
-;; Markdown
-(use-package markdown-mode
-  :ensure t
-  :mode (("README\\.md\\'" . gfm-mode)
-         ("\\.md\\'" . markdown-mode)
-         ("\\.markdown\\'" . markdown-mode)))
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; FERRAMENTAS DE DESENVOLVIMENTO
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-;; Magit para Git
-(use-package magit
-  :ensure t
-  :bind (("C-x g" . magit-status)))
-
-;; Quickrun para executar código
-(use-package quickrun
-  :ensure t
-  :bind ("C-c r" . quickrun))
-
-;; Dumb-jump para navegação de código
-(use-package dumb-jump
-  :ensure t
-  :config
-  (setq dumb-jump-selector 'ivy)
-  (add-hook 'xref-backend-functions #'dumb-jump-xref-activate))
-
-;; Ripgrep para busca de texto
-(use-package ripgrep
-  :ensure t
-  :custom
-  (ripgrep-highlight-search t
-   "Highlight search term in results."))
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; INTEGRAÇÕES COM IA
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-;; Aider para assistência de código com IA
-(use-package aider
-  :load-path "~/.emacs.d/lisp/aider"
-  :config
-  (setq aider-args '("--model" "sonnet"))
-  (when (boundp 'anthropic-api-key)
-    (setenv "ANTHROPIC_API_KEY" anthropic-api-key))
-  :bind
-  (("C-c a" . aider-transient-menu)))
-
 (provide 'init)
 ;;; init.el ends here
+(put 'upcase-region 'disabled nil)

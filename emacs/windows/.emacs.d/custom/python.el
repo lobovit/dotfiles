@@ -1,52 +1,27 @@
-;; python.el - Configuration for Python development
+;;; python.el --- Configuração para desenvolvimento em Python -*- lexical-binding: t -*-
 
-;; Ensure lsp-mode is installed for LSP support
-(use-package lsp-mode
-  :ensure t
-  :hook (python-mode . lsp-deferred)
-  :commands (lsp lsp-deferred))
+;;; Commentary:
+;; Configurações específicas para desenvolvimento em Python
 
-;; Configuration for lsp-python, using pyright or pylsp as the backend
-(use-package lsp-pyright
-  :ensure t
-  :hook (python-mode . (lambda ()
-                         (require 'lsp-pyright)
-                         (lsp-deferred))) ; or lsp to start immediately
-  :init
-  ;; Set this to the Python interpreter you wish to use
-  ;; You can also configure per-project interpreters with .dir-locals.el
-  (setq lsp-pyright-python-executable-cmd "python3"))
+;;; Code:
 
-;; Use python-mode package instead of built-in python.el to avoid warnings
-(use-package python
-  :ensure nil  ;; Já vem com o Emacs
-  :mode ("\\.py\\'" . python-mode)
-  :hook (python-mode . lsp-deferred)
-  :config
-  ;; Define funções que estão gerando warnings
-  (unless (fboundp 'python-indent)
-    (defun python-indent ()
-      "Indent current line as Python code."
-      (interactive)
-      (indent-line-to (python-indent-calculate-indentation))))
+;; Hooks específicos para Python
+(add-hook 'python-mode-hook 'lsp-deferred)
+
+;; Configurações específicas para LSP com Python
+(with-eval-after-load 'lsp-mode
+  ;; Adicionar configuração de ID de linguagem para Python
+  (add-to-list 'lsp-language-id-configuration '(python-mode . "python"))
   
-  (unless (fboundp 'python-info-ppss-context)
-    (defun python-info-ppss-context (type &optional syntax-ppss)
-      "Return non-nil if point is on TYPE using SYNTAX-PPSS.
-TYPE can be 'comment, 'string or 'paren."
-      (let ((ppss (or syntax-ppss (syntax-ppss))))
-        (cond ((eq type 'comment)
-               (nth 4 ppss))
-              ((eq type 'string)
-               (nth 3 ppss))
-              ((eq type 'paren)
-               (nth 1 ppss))
-              (t nil))))))
+  ;; Configurações específicas para pyright
+  (setq lsp-pyright-typechecking-mode "basic"
+        lsp-pyright-auto-import-completions t
+        lsp-pyright-auto-search-paths t))
 
-;; Additional configuration for LSP UI (optional but recommended for better UX)
-(use-package lsp-ui
-  :ensure t
-  :commands lsp-ui-mode)
+;; Keybindings específicos para Python
+(with-eval-after-load 'python-mode
+  (define-key python-mode-map (kbd "C-c C-r") 'python-shell-send-region)
+  (define-key python-mode-map (kbd "C-c C-b") 'python-shell-send-buffer))
 
-;; Finalizes the configuration of python.el
 (provide 'python)
+;;; python.el ends here

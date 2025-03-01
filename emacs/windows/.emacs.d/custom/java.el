@@ -1,29 +1,30 @@
-;;; Java Development Setup for Emacs
+;;; java.el --- Configuração para desenvolvimento em Java -*- lexical-binding: t -*-
 
-;; Carregar lsp-java para habilitar o LSP no java-mode
-(use-package lsp-java
-  :ensure t
-  :config
-  (add-hook 'java-mode-hook 'lsp) ;; Ativa o LSP para Java
-  (setq lsp-java-vmargs
-        '("-XX:+UseG1GC" "-XX:+UseStringDeduplication" "-Xmx2G"))
-  ;; Ajuste o caminho do Java, se necessário
-  ;; (setq lsp-java-java-path "path_to_your_java")
-  (setq lsp-java-save-action-organize-imports t)
-  (setq lsp-java-autobuild-enabled t))
+;;; Commentary:
+;; Configurações específicas para desenvolvimento em Java
 
-;; DAP Mode para depuração de Java
-(use-package dap-java
-  :ensure nil
-  :after lsp-java)
+;;; Code:
 
-;; Funções e atalhos adicionais para LSP e DAP
-(global-set-key (kbd "C-c l d") 'dap-java-debug)          ;; Depurar projeto Java
-(global-set-key (kbd "C-c l D") 'dap-java-debug-test-class) ;; Depurar classe de teste
-(global-set-key (kbd "C-c l M") 'dap-java-debug-test-method) ;; Depurar método de teste
+;; Hooks específicos para Java
+(add-hook 'java-mode-hook 'lsp)
 
-;; Spring Initializer com LSP para criar projetos Spring Boot
+;; Configurações específicas para LSP com Java
+(with-eval-after-load 'lsp-java
+  ;; Configurações específicas para o Java Language Server
+  (setq lsp-java-format-settings-url "https://raw.githubusercontent.com/google/styleguide/gh-pages/eclipse-java-google-style.xml")
+  (setq lsp-java-format-settings-profile "GoogleStyle"))
+
+;; Keybindings específicos para Java e DAP
+(with-eval-after-load 'java-mode
+  (define-key java-mode-map (kbd "C-c l d") 'dap-java-debug)
+  (define-key java-mode-map (kbd "C-c l D") 'dap-java-debug-test-class)
+  (define-key java-mode-map (kbd "C-c l M") 'dap-java-debug-test-method))
+
+;; Função para criar projetos Spring Boot
 (defun java/spring-initializer ()
   "Use lsp-java-spring-initializer to create a new Spring Boot project."
   (interactive)
   (lsp-java-spring-initializer))
+
+(provide 'java)
+;;; java.el ends here

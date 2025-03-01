@@ -1,26 +1,24 @@
-;;; yaml.el --- YAML mode configuration -*- lexical-binding: t -*-
+;;; yaml.el --- Configuração para YAML -*- lexical-binding: t -*-
 
 ;;; Commentary:
-;; Configuração para edição de arquivos YAML
+;; Configurações específicas para edição de arquivos YAML
 
 ;;; Code:
 
-(use-package yaml-mode
-  :ensure t
-  :mode (("\\.yml\\'" . yaml-mode)
-         ("\\.yaml\\'" . yaml-mode))
-  :config
-  ;; Definir a variável yaml-indent-offset para evitar warning
-  (defvar yaml-indent-offset 2
-    "Número de espaços para indentação em arquivos YAML.")
+;; Hooks específicos para YAML
+(add-hook 'yaml-mode-hook
+          (lambda ()
+            ;; Configurar indentação para YAML
+            (setq tab-width 2)
+            (setq indent-tabs-mode nil)))
+
+;; Configurações específicas para YAML
+(with-eval-after-load 'yaml-mode
+  ;; Configurar faces específicas para YAML
+  (set-face-attribute 'yaml-tab-face nil :background "red" :foreground "white")
   
-  ;; Definir a função yaml-indent para evitar warning
-  (unless (fboundp 'yaml-indent)
-    (defun yaml-indent ()
-      "Indent current line as YAML code."
-      (interactive)
-      (let ((indent (+ (current-indentation) yaml-indent-offset)))
-        (indent-line-to indent)))))
+  ;; Configurar keybindings específicos
+  (define-key yaml-mode-map (kbd "C-c C-v") 'yaml-mode-validate-buffer))
 
 (provide 'yaml)
 ;;; yaml.el ends here 

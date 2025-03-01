@@ -23,9 +23,6 @@
   (define-key lsp-ui-mode-map (kbd "M-.") #'lsp-ui-peek-find-definitions)
   (define-key lsp-ui-mode-map (kbd "M-?") #'lsp-ui-peek-find-references))
 
-(use-package lsp-ivy
-  :ensure t
-  :commands lsp-ivy-workspace-symbol)
 
 (use-package lsp-treemacs
   :ensure t
@@ -49,7 +46,12 @@
 (use-package company-box
   :ensure t
   :after company
-  :hook (company-mode . company-box-mode))
+  :if (display-graphic-p)  ;; Só carregar em modo gráfico
+  :hook (company-mode . (lambda ()
+                          (when (package-installed-p 'company-box)
+                            (company-box-mode))))
+  :config
+  (setq company-box-icons-alist 'company-box-icons-all-the-icons))
 
 ;; flycheck
 (use-package flycheck
@@ -66,6 +68,16 @@
   :config
   (flycheck-pos-tip-mode))
 
+;; Hooks específicos para C/C++
+(add-hook 'c-mode-hook 'lsp-deferred)
+(add-hook 'c++-mode-hook 'lsp-deferred)
+
+;; Configurações específicas para LSP em C/C++
+(with-eval-after-load 'lsp-mode
+  (add-to-list 'lsp-language-id-configuration '(c-mode . "c"))
+  (add-to-list 'lsp-language-id-configuration '(c++-mode . "cpp")))
+
+;; Pacotes específicos para C/C++
 (use-package ccls
   :ensure t
   :hook ((c-mode c++-mode objc-mode cuda-mode) .

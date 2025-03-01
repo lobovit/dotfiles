@@ -1,52 +1,89 @@
-;; Ensure use-package is available
-(require 'use-package)
+;;; golang.el --- Configuração para desenvolvimento em Go -*- lexical-binding: t -*-
 
-;; LSP Mode for Golang
-(use-package lsp-mode
-  :ensure t
-  :commands (lsp lsp-deferred)
-  :hook (go-mode . lsp-deferred) ;; Automatically start lsp-mode with Go files
-  :config
-  ;; Set specific LSP configurations for Golang development
-  (setq lsp-prefer-flymake nil) ;; Prefer using lsp-ui (flycheck) over flymake
-  (setq lsp-gopls-staticcheck t) ;; Enable staticcheck for extra analysis
-  (setq lsp-gopls-complete-unimported t)) ;; Auto-complete even unimported packages
+;;; Commentary:
+;; Configurações específicas para desenvolvimento em Go
 
-;; Additional LSP UI improvements
-(use-package lsp-ui
-  :ensure t
-  :commands lsp-ui-mode
-  :config
-  (setq lsp-ui-doc-enable t
-        lsp-ui-doc-position 'top
-        lsp-ui-sideline-enable nil)) ;; Configure as needed
+;;; Code:
 
-;; Company mode for autocompletion
-(use-package company
-  :ensure t
-  :config
-  (global-company-mode)
-  (setq company-minimum-prefix-length 1
-        company-idle-delay 0.0)) ;; Immediate suggestions
+;; Definir variável 'error' para evitar warning de variável livre
+(defvar error nil "Variável para evitar warning de variável livre.")
 
-;; Go specific settings
+;; Hooks específicos para Go
+(add-hook 'go-mode-hook 'lsp-deferred)
+
+;; Configurações específicas para Go
 (defun my-go-mode-setup ()
   "Custom Go mode settings."
-  ;; Use goimports for formatting if available, otherwise gofmt
+  ;; Configurar indentação para Go
+  (setq tab-width 4)
+  ;; Configurar formatação automática
   (setq gofmt-command "goimports")
-  (add-hook 'before-save-hook 'gofmt-before-save) ;; Format before saving
-
-  ;; Set tab width for Go files (Go uses tabs)
-  (setq tab-width 4))
+  (add-hook 'before-save-hook 'gofmt-before-save nil t))
 
 (add-hook 'go-mode-hook 'my-go-mode-setup)
 
-;; Optional: Use go-fill-struct and go-add-tags for struct manipulation
-(use-package go-fill-struct
-  :ensure t)
+;; Configurações específicas para LSP com Go
+(with-eval-after-load 'lsp-mode
+  ;; Adicionar configuração de ID de linguagem para Go
+  (add-to-list 'lsp-language-id-configuration '(go-mode . "go"))
+  
+  ;; Configurações específicas para gopls
+  (setq lsp-gopls-staticcheck t
+        lsp-gopls-complete-unimported t))
 
-(use-package go-add-tags
-  :ensure t)
+;; Keybindings específicos para Go
+(with-eval-after-load 'go-mode
+  (define-key go-mode-map (kbd "C-c C-f") 'go-fill-struct)
+  (define-key go-mode-map (kbd "C-c C-t") 'go-add-tags))
 
-;; Ensure the Go language server is installed for LSP:
-;; Run 'go install golang.org/x/tools/gopls@latest' in your terminal.
+;; Lidar com funções obsoletas
+(with-eval-after-load 'go-mode
+  ;; Substituir a função obsoleta go-guess-gopath
+  (defun my-go-guess-gopath ()
+    "Substituição para go-guess-gopath que foi descontinuada."
+    (warn "GOPATH foi descontinuado em favor dos módulos Go"))
+  
+  ;; Definir funções que podem não estar disponíveis
+  (unless (fboundp 'lsp-rename)
+    (defun lsp-rename ()
+      "Stub para lsp-rename quando não disponível."
+      (interactive)
+      (message "lsp-rename não está disponível")))
+  
+  (unless (fboundp 'eglot-rename)
+    (defun eglot-rename ()
+      "Stub para eglot-rename quando não disponível."
+      (interactive)
+      (message "eglot-rename não está disponível")))
+  
+  (unless (fboundp 'lsp-execute-code-action-by-kind)
+    (defun lsp-execute-code-action-by-kind (kind)
+      "Stub para lsp-execute-code-action-by-kind quando não disponível."
+      (message "lsp-execute-code-action-by-kind não está disponível")))
+  
+  (unless (fboundp 'eglot-code-actions)
+    (defun eglot-code-actions (beg end)
+      "Stub para eglot-code-actions quando não disponível."
+      (message "eglot-code-actions não está disponível")))
+  
+  (unless (fboundp 'eglot--code-action-bounds)
+    (defun eglot--code-action-bounds ()
+      "Stub para eglot--code-action-bounds quando não disponível."
+      (cons (point) (point)))))
+
+;; Corrigir docstrings muito longas
+(with-eval-after-load 'go-mode
+  (dolist (sym '(go-mode go-get-root go-goto-function-name))
+    (when (fboundp sym)
+      (let ((doc (documentation sym)))
+        (when (and doc (> (length doc) 80))
+          (put sym 'function-documentation 
+               (with-temp-buffer
+                 (insert doc)
+                 (goto-char (point-min))
+                 (while (re-search-forward "\\(.\\{70,79\\}\\) " nil t)
+                   (replace-match "\\1\n" nil nil))
+                 (buffer-string))))))))
+
+(provide 'golang)
+;;; golang.el ends here

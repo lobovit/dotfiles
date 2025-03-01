@@ -1,38 +1,52 @@
-;; Ensure use-package is available
-(require 'use-package)
+;;; shell.el --- Configuração para shell e terminal -*- lexical-binding: t -*-
 
-;; Basic settings for shell script editing
-(defun my-shell-mode-setup ()
-  "Custom setup for shell-mode (shell scripts)."
-  (setq sh-basic-offset 2) ;; Set indentation offset to 2 spaces
-  (setq sh-indentation 2)  ;; Indentation level for shell scripts
-  (setq tab-width 2)       ;; Display tabs as 2 spaces
-  ;; Enable electric-pair-mode for automatic closing of quotes and brackets
-  (electric-pair-mode 1))
+;;; Commentary:
+;; Configurações específicas para shell e terminal
 
-;; Add the setup function to sh-mode-hook
-(add-hook 'sh-mode-hook 'my-shell-mode-setup)
+;;; Code:
 
-;; lsp-mode configuration for shell scripts
-(use-package lsp-mode
-  :ensure t
-  :commands (lsp lsp-deferred)
-  :hook (sh-mode . lsp-deferred) ;; Automatically start lsp-mode in sh-mode
-  :config
-  ;; Additional lsp-mode configurations can go here
-  (setq lsp-prefer-flymake nil)) ;; Prefer lsp-ui (flycheck) over flymake if available
+;; Hooks específicos para shell-mode
+(add-hook 'shell-mode-hook
+          (lambda ()
+            ;; Desativar elementos visuais que podem atrapalhar
+            (setq-local show-trailing-whitespace nil)
+            (setq-local global-hl-line-mode nil)
+            (display-line-numbers-mode -1)
+            
+            ;; Desativar todos os recursos de completion
+            (company-mode -1)
+            (setq-local completion-at-point-functions nil)
+            (setq-local comint-dynamic-complete-functions nil)
+            (setq-local shell-dynamic-complete-functions nil)
+            
+            ;; Configurações do shell
+            (setq-local comint-process-echoes nil)
+            (setq-local comint-prompt-read-only nil)
+            (setq-local comint-use-prompt-regexp nil)
+            (setq-local comint-inhibit-carriage-motion t)
+            
+            ;; Melhorar a interpretação de cores ANSI
+            (xterm-color-mode 1)))
 
-;; Optional: lsp-ui for enhanced UI elements like pop-up documentation
-(use-package lsp-ui
-  :ensure t
-  :commands lsp-ui-mode
-  :config
-  (setq lsp-ui-doc-enable t
-        lsp-ui-doc-position 'top
-        lsp-ui-doc-include-signature t
-        lsp-ui-sideline-enable nil))
+;; Configurações específicas para Windows/MSYS2
+(when (eq system-type 'windows-nt)
+  ;; Função para abrir MSYS2 shell no buffer atual
+  (defun msys2-shell-toggle ()
+    "Toggle MSYS2 shell in current buffer."
+    (interactive)
+    (let ((shell-buffer (get-buffer "*shell*")))
+      (if (and shell-buffer (eq (current-buffer) shell-buffer))
+          (previous-buffer)
+        (shell))))
+  
+  ;; Atalho para alternar o shell MSYS2
+  (global-set-key (kbd "C-c e") 'msys2-shell-toggle))
 
-;; Install and configure bash-language-server for lsp-mode
-;; Ensure you have bash-language-server installed on your system:
-;; npm i -g bash-language-server
-;; This provides LSP features like auto-completion and hover documentation for shell scripts.
+;; Configurações globais do shell
+(setq shell-command-prompt-show-cwd t)
+(setq comint-scroll-to-bottom-on-input t)
+(setq comint-scroll-to-bottom-on-output t)
+(setq comint-move-point-for-output t)
+
+(provide 'shell)
+;;; shell.el ends here
