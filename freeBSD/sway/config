@@ -65,26 +65,12 @@ output DP-2 resolution 1920x1080@60Hz position 1920 0 transform 90
 #   }
 #
   
-    # RK H81 via dongle "Compx"
-    input "13652:64009:Compx_2.4G_Wireless_Receiver,_class_0/0,_rev_2.00/20.06,_addr_2" {
-        xkb_layout us
-        xkb_variant intl
-        repeat_delay 250
-        repeat_rate 30
-    }
+input * {
+    xkb_layout us
+    xkb_variant alt-intl
+    xkb_options altwin:meta_alt,lv3:ralt_switch
+}
 
-    # RK H81 via dongle "LXDDZ 2.4G 8K HS"
-    input "7511:64101:LXDDZ_2.4G_8K_HS_Receiver,_class_0/0,_rev_2.00/0.16,_addr_1" {
-        xkb_layout us
-        xkb_variant intl
-        repeat_delay 250
-        repeat_rate 30
-    }
-
- 
-    input * {
-        xkb_options "altwin:meta_alt"
-    }
 
 #
 # You can also configure each device individually.
@@ -260,3 +246,4 @@ bar {
 }
 
 include /usr/local/etc/sway/config.d/*
+exec_always swaymsg 'input "0:0:System_keyboard_multiplexer" xkb_options lv3:ralt_switch'
