@@ -4,8 +4,18 @@ RUNDIR="/var/run/user/$UIDNUM"
 
 exec dbus-run-session -- sh -lc '
   export XDG_CURRENT_DESKTOP=sway
-  export XDG_RUNTIME_DIR="'$RUNDIR'"
+  export XDG_RUNTIME_DIR="'"$RUNDIR"'"
   mkdir -p "$XDG_RUNTIME_DIR"; chmod 700 "$XDG_RUNTIME_DIR"
+
+  # 🔧 Mitigações wlroots/DRM
+  export WLR_DRM_NO_ATOMIC=1               # <- chave: evita os REG_WAIT timeout/optc32
+  export WLR_DRM_NO_MODIFIERS=1            # <- opcional, reduz paths com dmabuf modifiers
+  # export WLR_RENDERER=vulkan              # <- opcional (RADV), só habilite se tudo ok com Vulkan
+  # export WLR_NO_HARDWARE_CURSORS=1        # <- use se ainda tiver glitch de cursor
+
+  # 🎥 VA-API (decode ok; encode WebRTC fica a critério do browser)
+  export LIBVA_DRIVER_NAME=radeonsi
+  export MOZ_ENABLE_WAYLAND=1
 
   # mata instâncias antigas (se houver)
   pkill -x xdg-desktop-portal xdg-desktop-portal-wlr wireplumber pipewire 2>/dev/null || true
