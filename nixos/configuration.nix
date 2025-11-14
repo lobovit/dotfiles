@@ -10,6 +10,7 @@
       ./hardware-configuration.nix
     ];
 
+  
   # Use the systemd-boot EFI boot loader.
   boot.loader.systemd-boot.enable = true;
   boot.loader.efi.canTouchEfiVariables = true;
@@ -18,10 +19,18 @@
   # Pick only one of the below networking options.
   # networking.wireless.enable = true;  # Enables wireless support via wpa_supplicant.
   networking.networkmanager.enable = true;  # Easiest to use and most distros use this by default.
+  networking.networkmanager.dns = "default";
 
   # Set your time zone.
   time.timeZone = "America/Sao_Paulo";
 
+  # Thunar
+  services.gvfs.enable = true;
+  services.tumbler.enable = true;
+  services.udisks2.enable = true;
+  services.devmon.enable = true;
+
+  
   # Configure network proxy if necessary
   # networking.proxy.default = "http://user:password@proxy:port/";
   # networking.proxy.noProxy = "127.0.0.1,localhost,internal.domain";
@@ -37,22 +46,22 @@
   # Enable the X11 windowing system.
   # services.xserver.enable = true;
 
-
-  # filesystem ntfs
-  fileSystems."/mnt/windows" = {
-    device = "/dev/sda2";
-    fsType = "ntfs-3g";
-    options = [ "uid=1000" "gid=100" "dmask=022" "fmask=133" ];
-  };
-
-   fileSystems."/mnt/windows".neededForBoot = false;
-
   services.gnome.gnome-keyring.enable = true;
 
   programs.sway = {
     enable = true;
     wrapperFeatures.gtk = true;
   };
+
+ # XDG portals para sway + wayland
+  services.dbus.enable = true;
+
+  xdg.portal = {
+    enable = true;
+    wlr.enable = true;
+    config.sway.default = lib.mkForce "wlr";
+  };
+
 
   # Configure keymap in X11
   # services.xserver.xkb.layout = "us";
@@ -71,6 +80,14 @@
     jack.enable = true;
   };
 
+
+  # new filesystem
+  fileSystems."/mnt/games" = {
+    device = "/dev/sda2";
+    fsType = "ext4";
+    options = [ "noatime" ];
+  };
+
   # Enable touchpad support (enabled default in most desktopManager).
   # services.libinput.enable = true;
 
@@ -86,6 +103,7 @@
 
   # flakes
   nix.settings.experimental-features = [ "nix-command" "flakes" ];
+  nixpkgs.config.allowUnfree = true;
 
   programs.firefox.enable = true;
 
@@ -108,7 +126,35 @@
      gimp
      blender
      audacity
+     git
+     gcc
+     xfce.thunar
+     xfce.thunar-archive-plugin
+     file-roller
+     xfce.thunar-volman
+     p7zip
+     unzip
+     wf-recorder
+     ffmpeg
+     mangohud
+     gamemode
+     xdg-desktop-portal-wlr
+     xdg-desktop-portal-gtk
    ];
+
+  # Fonts
+  fonts.packages = with pkgs; [
+    fira-code
+    fira
+    cooper-hewitt
+    ibm-plex
+    jetbrains-mono
+    iosevka
+    # bitmap
+    spleen
+    fira-code-symbols
+    powerline-fonts
+  ];
 
   # Some programs need SUID wrappers, can be configured further or are
   # started in user sessions.
@@ -117,6 +163,23 @@
   #   enable = true;
   #   enableSSHSupport = true;
   # };
+
+
+  # Steam + Proton
+  hardware.graphics.enable = true;
+  hardware.steam-hardware.enable = true;
+
+  programs.steam = {
+    enable = true;
+
+    remotePlay.openFirewall = true;
+    dedicatedServer.openFirewall = true;
+
+    };
+
+  # Gamemode daemon
+  programs.gamemode.enable = true;
+
 
   # List services that you want to enable:
 
@@ -129,6 +192,9 @@
   # Or disable the firewall altogether.
   # networking.firewall.enable = false;
 
+  networking.firewall.enable = true;
+
+ 
   # Copy the NixOS configuration file and link it from the resulting system
   # (/run/current-system/configuration.nix). This is useful in case you
   # accidentally delete configuration.nix.
