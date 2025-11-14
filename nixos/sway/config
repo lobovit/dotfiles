@@ -1,4 +1,4 @@
-# Default config for sway
+2# Default config for sway
 #
 # Copy this to ~/.config/sway/config and edit it to your liking.
 #
@@ -67,8 +67,7 @@ output DP-2 resolution 1920x1080@60Hz position 1920 0 transform 90
   
 input * {
     xkb_layout us
-    xkb_variant alt-intl
-    xkb_options altwin:meta_alt,lv3:ralt_switch
+    xkb_variant intl
 }
 
 

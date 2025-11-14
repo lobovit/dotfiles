@@ -35,13 +35,21 @@
   # networking.proxy.default = "http://user:password@proxy:port/";
   # networking.proxy.noProxy = "127.0.0.1,localhost,internal.domain";
 
-  # Select internationalisation properties.
-  # i18n.defaultLocale = "en_US.UTF-8";
-  # console = {
-  #   font = "Lat2-Terminus16";
-  #   keyMap = "us";
-  #   useXkbConfig = true; # use xkb.options in tty.
-  # };
+  # Layout do teclado no sistema todo (tty + X/Wayland)
+  i18n.defaultLocale = "en_US.UTF-8";
+
+  services.xserver = {
+    xkb.layout = "us";
+    xkb.variant = "intl";
+    # opcional, se quiser CapsLock => Escape:
+    # xkb.options = "caps:escape";
+  };
+
+  # Faz o console (tty) usar a mesma config de teclado
+  console = {
+    useXkbConfig = true;
+    # NÃO definir console.keyMap aqui pra não dar conflito
+  };
 
   # Enable the X11 windowing system.
   # services.xserver.enable = true;
@@ -52,6 +60,7 @@
     enable = true;
     wrapperFeatures.gtk = true;
   };
+
 
  # XDG portals para sway + wayland
   services.dbus.enable = true;
@@ -140,6 +149,7 @@
      gamemode
      xdg-desktop-portal-wlr
      xdg-desktop-portal-gtk
+     zoom-us
    ];
 
   # Fonts
