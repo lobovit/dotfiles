@@ -134,6 +134,7 @@
 
     # --- Elixir / Phoenix dev ---
     elixir
+    elixir_ls
     erlang
     nodejs_24
     yarn
@@ -145,6 +146,9 @@
     libxml2
     curl
     libiconv
+
+    # llm
+    lmstudio
     ];
 
   # Variáveis de ambiente para mix/hex e Erlang
@@ -169,18 +173,17 @@
 
   # Fonts
   fonts.packages = with pkgs; [
-    fira-code
-    fira
-    cooper-hewitt
-    ibm-plex
-    jetbrains-mono
-    iosevka
-    # bitmap
-    spleen
-    fira-code-symbols
-    powerline-fonts
+    nerd-fonts.fira-code
+    nerd-fonts.droid-sans-mono
+    nerd-fonts.noto
+    nerd-fonts.hack
+    nerd-fonts.ubuntu
+    # nerd-fonts.mplu 
+    nerd-fonts.symbols-only
+    nerd-fonts.hurmit
+    nerd-fonts.iosevka-term
+    nerd-fonts.jetbrains-mono
   ];
-
   # yazi
   programs.yazi.enable = true;
 
