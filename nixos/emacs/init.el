@@ -102,39 +102,27 @@
 
 (use-package dashboard
   :ensure t
-  :config
-  ;; Esta é a função correta para configurar o Dashboard
-  (dashboard-initialize)
-
-  ;; Garante que o dashboard abra na inicialização
-  (add-hook 'emacs-startup-hook 'dashboard-open)
-
-  ;; Desativar a tela inicial padrão do Emacs
+  :init
+  ;; Desativar tela padrão logo no começo
   (setq inhibit-startup-screen t
 	initial-scratch-message nil)
-
-  ;; --- Configurações do Dashboard ---
-  (setq dashboard-center-content t)
-  (setq dashboard-show-doom-logo nil)
-  (setq dashboard-footer-messages nil)
-
-  ;; Caminho para a sua imagem (Garanta que a imagem transparente esteja salva aqui)
-(setq dashboard-startup-banner
-	(expand-file-name "images/lobo_transparente.png" user-emacs-directory))
-  ;; (isso vira ~/.emacs.d/images/lobo_transparente.png automaticamente)
-
-  ;; Itens que aparecem no Dashboard
-  (setq dashboard-items '(
-			  (recents  . 5)
+  :config
+  ;; Configurações do Dashboard
+  (setq dashboard-center-content t
+	dashboard-show-doom-logo nil
+	dashboard-footer-messages nil
+	dashboard-startup-banner
+	(expand-file-name "images/lobo_transparente.png" user-emacs-directory)
+	dashboard-items '((recents  . 5)
 			  (projects . 5)
 			  (bookmarks . 5)
-			  (agenda . 5)
-			  ))
+			  (agenda . 5)))
 
+  ;; Hook oficial recomendado
+  (dashboard-setup-startup-hook)
 
   ;; Atalho para voltar ao dashboard
-  (global-set-key (kbd "C-c d") 'dashboard-open))
-
+  (global-set-key (kbd "C-c d") #'dashboard-open))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; INTERFACE CLEAN
@@ -170,34 +158,65 @@
   :ensure t
   :init (global-flycheck-mode))
 
-;; 1. Modo Básico do Elixir (Sintaxe e Formatação)
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; ELIXIR DEV
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+;; Sintaxe e mix format
 (use-package elixir-mode
   :ensure t
+  :hook (elixir-mode . my/elixir-setup)
   :config
-  ;; Configura o 'mix format' para rodar ao salvar
-  (add-hook 'elixir-mode-hook
-	    (lambda () (add-hook 'before-save-hook 'elixir-format nil t))))
+  (defun my/elixir-setup ()
+    ;; formatar com mix format ao salvar
+    (add-hook 'before-save-hook #'elixir-format nil t)))
 
 
-;; LSP nativo: Eglot
+(use-package flycheck-credo
+  :after flycheck
+  :config
+  (flycheck-credo-setup))
+
+
+;; LSP nativo: Eglot + elixir-ls
 (use-package eglot
-  :ensure nil                       ;; já vem com o Emacs 29+
+  :ensure nil                           ;; já vem com o Emacs 29+
   :hook (elixir-mode . eglot-ensure)
   :config
-  ;; Diz pro Eglot qual servidor usar para Elixir
-  ;; No NixOS, garanta que `elixir-ls` está instalado no PATH
   (add-to-list 'eglot-server-programs
 	       '(elixir-mode . ("elixir-ls"))))
+
+;; Helpers simples pro mix
+(defun my/elixir-mix-test-file ()
+  "Roda `mix test` no arquivo atual."
+  (interactive)
+  (let ((cmd (format "cd %s && mix test %s"
+		     (project-root (project-current t))
+		     (file-relative-name (buffer-file-name)
+					 (project-root (project-current t))))))
+    (compile cmd)))
+
+(defun my/elixir-iex ()
+  "Abre um iex -S mix na raiz do projeto."
+  (interactive)
+  (let ((default-directory (project-root (project-current t))))
+    (ansi-term "iex" "iex -S mix")))
+
+(global-set-key (kbd "C-c t") #'my/elixir-mix-test-file)
+(global-set-key (kbd "C-c i") #'my/elixir-iex)
+
 
  ;; custom-set-variables was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
+;; If there is more than one, they won't work right.
+(custom-set-variables
 '(package-selected-packages
-  '(dashboard doom-modeline doom-themes elixir-mode flycheck))
+  '(dashboard doom-modeline doom-themes elixir-mode flycheck)))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
  )
+;;; init.el ends here
