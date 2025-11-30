@@ -7,7 +7,7 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;;; Code:
-(electric-pair-mode 1)                           ;; Ativar o modo de automático para ()[]{}
+;;(electric-pair-mode 1)                           ;; Ativar o modo de automático para ()[]{}
 (electric-indent-mode 1)                         ;; Ativar o modo de indentação
 (global-subword-mode 1)                          ;; Ativar o modo de subpalavras
 (delete-selection-mode 1)                        ;; Ativar o modo de seleção
@@ -44,9 +44,8 @@
 			 ("gnu" . "https://elpa.gnu.org/packages/")
 			 ("nongnu" . "https://elpa.nongnu.org/nongnu/")))
 
-;; NOTA: Removemos (package-initialize) para sumir com o Warning.
+;; NOTA: removi o (package-initialize) para sumir com o Warning.
 ;; O Emacs moderno faz isso sozinho.
-
 ;; CORREÇÃO DO ERRO "PACKAGE UNAVAILABLE":
 ;; Se a lista de pacotes estiver vazia, forçamos o download agora.
 (unless (package-installed-p 'use-package)
@@ -151,12 +150,147 @@
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; DEVELOPMENT TOOLS
+;; PRODUTIVIDADE
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(use-package flycheck
-  :ensure t
-  :init (global-flycheck-mode))
+;; which-key: mostra sugestões de atalhos conforme você digita (ex: C-c ...)
+(use-package which-key
+  :init
+  ;; Tempo até o which-key aparecer após você começar a digitar um prefixo
+  (setq which-key-idle-delay 2.0
+    which-key-idle-secondary-delay 1.0)
+  :config
+  ;; Ativa o modo which-key globalmente
+  (which-key-mode))
+
+;; Define o número máximo de arquivos salvos no histórico do recentf
+(setq recentf-max-saved-items 100)
+
+;; prescient: aprendizado automático de ordenação de itens (melhora buscas)
+(use-package prescient
+  :config
+  ;; Persiste o histórico de priorização entre sessões
+  (prescient-persist-mode))
+
+;; ivy: Core interface para minibuffer aprimorado (M-x, C-x b)
+(use-package ivy
+  :config
+  ;; Ativa Ivy globalmente (substitui M-x, C-x b, etc.)
+  (ivy-mode 1)
+  ;; Mostra buffers recentes
+  (setq ivy-use-virtual-buffers t))
+
+;; swiper: Busca interativa no buffer atual (substitui C-s padrão)
+(use-package swiper
+  :bind (("C-S-s" . swiper) ;; Mantendo o atalho C-S-s original
+	 ("C-s" . swiper)
+	 ("C-r" . swiper)))
+
+;; rg (rip-grep): Interface direta para busca rápida de conteúdo em arquivos
+(use-package rg
+  :bind (("C-c r" . rg))) ;; C-c r agora chama o rg diretamente
+
+;; helpful: substitui o help padrão com explicações muito melhores
+(use-package helpful
+  :init
+  ;; Configurações dependentes de counsel foram removidas
+  )
+
+;; dired-sidebar: painel lateral simples baseado no dired
+(use-package dired-sidebar
+  :bind ([f5] . dired-sidebar-toggle-sidebar)
+  :hook (dired-sidebar-mode . all-the-icons-dired-mode))
+
+;; all-the-icons: coleção de ícones usada por vários plugins
+(use-package all-the-icons
+  :defer)
+
+;; Ícones dentro do dired
+(use-package all-the-icons-dired
+  :after all-the-icons)
+
+;; ctrlf: substitui isearch com navegação mais moderna
+(use-package ctrlf
+  :config
+  (ctrlf-mode))
+
+;; goto-chg: pular para última mudança no buffer
+(use-package goto-chg
+  :bind ("C-c G" . goto-last-change)) ;; volta para a última edição
+
+;; smartparens: manipulação inteligente de parênteses e blocos
+(use-package smartparens
+  :hook ((prog-mode . smartparens-mode)          ;; ativa em linguagens
+     (emacs-lisp-mode . smartparens-strict-mode)) ;; strict mode em elisp
+  :init
+  (setq sp-base-key-bindings 'sp)
+  :config
+  ;; atalhos úteis dentro do smartparens
+  (define-key smartparens-mode-map [M-backspace] #'backward-kill-word)
+  (define-key smartparens-mode-map [M-S-backspace] #'sp-backward-unwrap-sexp)
+  ;; carrega configuração padrão
+  (require 'smartparens-config))
+
+;; multiple-cursors: múltiplos cursores simultâneos
+(use-package multiple-cursors
+  :bind (("C-c n" . mc/mark-next-like-this);; seleciona próxima ocorrência
+	 ("C-c p" . mc/mark-previous-like-this))) ;; seleciona ocorrência anterior
+
+;; ws-butler: remove espaços em branco só nas linhas editadas
+(use-package ws-butler
+  :hook (prog-mode . ws-butler-mode))
+
+;; Atalho rápido para salvar posição em um register
+(defalias 'pr #'point-to-register)
+
+;; C-c 1 ... C-c 9 mudam tabs do tab-bar
+(dolist (i (number-sequence 1 9))
+  (global-set-key (format "\C-c%d" i)
+    `(lambda () (interactive) (tab-select ,i))))
+
+;; Ativa interface de abas nativa do Emacs
+(tab-bar-mode 1)
+
+;; Ativa abbrev globally (expansões automáticas de texto)
+(setq-default abbrev-mode 1)
+
+;; company-mode: autocomplete
+(use-package company
+  :bind (:map prog-mode-map
+     ("C-i" . company-indent-or-complete-common) ;; TAB inteligente
+       )
+  :hook (emacs-lisp-mode . company-mode)
+  :config
+  ;; Adiciona company-capf para usar o Eglot como backend no Elixir
+  (add-hook 'elixir-mode-hook
+	    (lambda ()
+	      (setq-local company-backends '(company-capf company-dabbrev-code company-files))
+	      (company-mode))))
+
+;; company-prescient: ordenação inteligente no autocomplete
+(use-package company-prescient
+  :after company
+  :config
+  (company-prescient-mode))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; GIT
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(use-package magit
+  :bind (("C-x g" . magit-status)
+	 ("C-x M-g" . magit-dispatch))
+  :init
+  (setq project-switch-commands nil)) ; avoid magit error on C-n/C-p
+
+(use-package git-messenger
+  :bind ("C-x G" . git-messenger:popup-message)
+  :config
+  (setq git-messenger:show-detail t
+	git-messenger:use-magit-popup t))
+
+(use-package git-timemachine
+  :bind ("C-c t" . git-timemachine))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; ELIXIR DEV
@@ -211,12 +345,24 @@
  ;; Your init file should contain only one such instance.
 ;; If there is more than one, they won't work right.
 (custom-set-variables
-'(package-selected-packages
-  '(dashboard doom-modeline doom-themes elixir-mode flycheck)))
+ ;; custom-set-variables was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ '(package-selected-packages
+   '(ace-jump-mode all-the-icons all-the-icons-dired
+           company company-prescient ctrlf dashboard
+           dired-sidebar doom-modeline doom-themes
+           elixir-mode flycheck-credo git-messenger
+           git-timemachine goto-chg helpful
+           ivy ivy-yasnippet magit multiple-cursors
+           nerd-icons prescient rg smartparens swiper
+           which-key ws-butler
+           yasnippet yasnippet-snippets)))
 (custom-set-faces
- ;; custom-set-faces was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- )
+ ;; custom-set-faces was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ )
 ;;; init.el ends here
