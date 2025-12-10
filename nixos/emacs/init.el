@@ -32,6 +32,25 @@
 (setq mark-ring-max 16)                          ;; Aumentar o tamanho do anel de marcas
 (setq global-mark-ring-max 32)                   ;; Aumentar o tamanho do anel global de marcas
 
+;;; Firefox como padrão quando clica em links
+(custom-set-variables
+ ;; custom-set-variables was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ '(browse-url-browser-function 'browse-url-firefox)
+ '(browse-url-firefox-new-window-is-tab t)
+ '(package-selected-packages
+   '(ace-jump-mode all-the-icons all-the-icons-dired company
+		   company-prescient ctrlf dashboard dired-sidebar
+		   doom-modeline doom-themes elixir-mode
+		   flycheck-credo git-messenger git-timemachine
+		   goto-chg helpful ivy ivy-yasnippet magit
+		   multiple-cursors nerd-icons org-modern prescient rg
+		   smartparens swiper which-key ws-butler yasnippet
+		   yasnippet-snippets)))
+
+
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; INICIALIZAÇÃO DE PACOTES (Essencial para NixOS/Linux)
@@ -62,7 +81,13 @@
 
 ;; Pré-requisito para o doom-modeline (ícones)
 (use-package nerd-icons
-  :ensure t)
+  :ensure t
+  ;; Define a fonte de ícones que o nerd-icons deve usar.
+  ;; Isso garante que os ícones sejam exibidos corretamente, mesmo que a fonte principal
+  ;; do Emacs não seja uma Nerd Font (como no seu caso, que usa apenas "Hack").
+  :custom
+  (nerd-icons-font-family "Symbols Nerd Font Mono")
+  )
 
 (use-package doom-themes
   :ensure t
@@ -111,7 +136,7 @@
 	dashboard-show-doom-logo nil
 	dashboard-footer-messages nil
 	dashboard-startup-banner
-	(expand-file-name "images/lobo_transparente.png" user-emacs-directory)
+	(expand-file-name "images/lobo.png" user-emacs-directory)
 	dashboard-items '((recents  . 5)
 			  (projects . 5)
 			  (bookmarks . 5)
@@ -137,7 +162,7 @@
 )
 
 ;; Configuração de fonte, barra de rolagem e menu
-(set-face-attribute 'default nil :family "Fira Code" :height 120)
+(set-face-attribute 'default nil :family "Hack Nerd Font Mono" :height 120)
 (tool-bar-mode -1)
 (scroll-bar-mode -1)
 (menu-bar-mode -1)
@@ -150,8 +175,34 @@
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; ORG-MODE
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+
+(use-package org-modern
+  :ensure t
+  :after org
+  :hook (org-mode . org-modern-mode))
+
+;; Opções adicionais para um visual moderno (Opcional)
+
+;; 1. Usar fonte Proporcional no corpo do texto (como em um editor de texto)
+(add-hook 'org-mode-hook 'variable-pitch-mode)
+
+;; 2. Ocultar todos os asteriscos de títulos, exceto o primeiro (limpa a visualização)
+(setq org-hide-leading-stars t)
+
+;; 3. Adicionar mais espaço entre os títulos (mais contraste)
+(custom-set-faces
+ ;; custom-set-faces was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ )
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; PRODUTIVIDADE
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;; which-key: mostra sugestões de atalhos conforme você digita (ex: C-c ...)
 (use-package which-key
@@ -344,25 +395,6 @@
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
 ;; If there is more than one, they won't work right.
-(custom-set-variables
- ;; custom-set-variables was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- '(package-selected-packages
-   '(ace-jump-mode all-the-icons all-the-icons-dired
-           company company-prescient ctrlf dashboard
-           dired-sidebar doom-modeline doom-themes
-           elixir-mode flycheck-credo git-messenger
-           git-timemachine goto-chg helpful
-           ivy ivy-yasnippet magit multiple-cursors
-           nerd-icons prescient rg smartparens swiper
-           which-key ws-butler
-           yasnippet yasnippet-snippets)))
-(custom-set-faces
- ;; custom-set-faces was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- )
+
+
 ;;; init.el ends here
