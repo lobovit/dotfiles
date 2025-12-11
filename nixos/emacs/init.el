@@ -387,68 +387,17 @@
 )
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; Eshell
+;; Eshell (Configuração Final Otimizada)
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;; 1. Variáveis de Configuração Global
-(setq eshell-history-size 5000
-      eshell-buffer-maximum-lines 5000
-      eshell-directory-name (expand-file-name "eshell" user-emacs-directory)
-      eshell-save-some-history t
-      eshell-scroll-to-bottom-on-input t
-      eshell-prefer-lisp-functions nil)
-
-;; 2. Prompt Personalizado (Sem alteração)
-(defun my/eshell-prompt-function ()
-  (let* ((dir (eshell/pwd))
-	 (dir-display (if (equal dir "~") dir (file-name-nondirectory dir)))
-	 (git-branch (if (featurep 'magit) (magit-get-current-branch) nil))
-	 (prompt-color (face-attribute 'font-lock-keyword-face :foreground))
-	 (git-string (if git-branch (format " [%s]" git-branch) ""))
-	 )
-    (insert (propertize (format "%s%s" dir-display git-string)
-			'face `(:foreground ,prompt-color :weight bold)))
-    (insert "\nλ ")
-    )
-  )
-(setq eshell-prompt-function 'my/eshell-prompt-function)
-
-
-;; 3. Hooks e Bindings (CORRIGIDO C-r)
-(add-hook 'eshell-mode-hook
-	  (lambda ()
-	    (define-key eshell-mode-map (kbd "<up>") 'eshell-previous-prompt)
-	    (define-key eshell-mode-map (kbd "<down>") 'eshell-next-prompt)
-
-	    ;; Substitui counsel-esh-history por `counsel-esh-history` (se counsel estiver instalado)
-	    ;; O `counsel-esh-history` agora faz parte do pacote `counsel`.
-	    ;; Se você instalou `counsel`, esta função deve funcionar.
-	    (define-key eshell-mode-map (kbd "C-r") 'counsel-esh-history)
-
-	    (define-key eshell-mode-map (kbd "C-c C-p") 'eshell-kill-buffer-and-window)
-
-	    (require 'eshell-cmpl)
-	    (eshell-cmpl-initialize)
-
-	    (require 'eshell-glob)
-	    ))
-
-;; 4. Atalho Rápido para Abrir/Alternar
-(global-set-key (kbd "C-c e") 'eshell)
-
-;; 5. REMOVA O BLOCO ABAIXO (era o causador do erro)
-;; (use-package counsel-esh :ensure t :after (ivy eshell))
-
-;; (Opcional) Adicione suas configurações de formatação (Prettier, por exemplo) aqui:
-;; (use-package prettier
-;;   :ensure t
-;;   :hook ((typescript-mode . prettier-mode)
-;;          (js-mode . prettier-mode)))
-
- ;; custom-set-variables was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
-;; If there is more than one, they won't work right.
+(setq eshell-history-size 5000         ; Aumenta o histórico
+      eshell-buffer-maximum-lines 5000 ; Aumenta o limite de linhas do buffer
+      eshell-directory-name (expand-file-name "eshell" user-emacs-directory) ; Local de arquivos de histórico/aliases
+      eshell-save-some-history t       ; Salva histórico automaticamente
+      eshell-scroll-to-bottom-on-input t ; Rola para baixo ao digitar
+      eshell-prefer-lisp-functions nil ; Permite que comandos externos (executáveis) prevaleçam
+      )
 
 
 ;;; Firefox como padrão quando clica em links
