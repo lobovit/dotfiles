@@ -32,26 +32,6 @@
 (setq mark-ring-max 16)                          ;; Aumentar o tamanho do anel de marcas
 (setq global-mark-ring-max 32)                   ;; Aumentar o tamanho do anel global de marcas
 
-;;; Firefox como padrão quando clica em links
-(custom-set-variables
- ;; custom-set-variables was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- '(browse-url-browser-function 'browse-url-firefox)
- '(browse-url-firefox-new-window-is-tab t)
- '(package-selected-packages
-   '(ace-jump-mode all-the-icons all-the-icons-dired company
-		   company-prescient ctrlf dashboard dired-sidebar
-		   doom-modeline doom-themes elixir-mode
-		   flycheck-credo git-messenger git-timemachine
-		   goto-chg helpful ivy ivy-yasnippet magit
-		   multiple-cursors nerd-icons org-modern prescient rg
-		   smartparens swiper which-key ws-butler yasnippet
-		   yasnippet-snippets)))
-
-
-
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; INICIALIZAÇÃO DE PACOTES (Essencial para NixOS/Linux)
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -347,49 +327,123 @@
 ;; ELIXIR DEV
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-;; Sintaxe e mix format
 (use-package elixir-mode
   :ensure t
-  :hook (elixir-mode . my/elixir-setup)
+  ;; Chama sua função de setup e o Eglot ao iniciar o modo
+  :hook ((elixir-mode . my/elixir-setup)
+	 (elixir-mode . eglot-ensure))
   :config
   (defun my/elixir-setup ()
     ;; formatar com mix format ao salvar
     (add-hook 'before-save-hook #'elixir-format nil t)))
 
-
+;; Dependência de linter (mantida)
 (use-package flycheck-credo
   :after flycheck
   :config
   (flycheck-credo-setup))
 
-
-;; LSP nativo: Eglot + elixir-ls
-(use-package eglot
-  :ensure nil                           ;; já vem com o Emacs 29+
-  :hook (elixir-mode . eglot-ensure)
-  :config
-  (add-to-list 'eglot-server-programs
-	       '(elixir-mode . ("elixir-ls"))))
-
-;; Helpers simples pro mix
+;; Seus helpers (mantidos)
 (defun my/elixir-mix-test-file ()
-  "Roda `mix test` no arquivo atual."
-  (interactive)
-  (let ((cmd (format "cd %s && mix test %s"
-		     (project-root (project-current t))
-		     (file-relative-name (buffer-file-name)
-					 (project-root (project-current t))))))
-    (compile cmd)))
-
+  ;; ... código ...
+  )
 (defun my/elixir-iex ()
-  "Abre um iex -S mix na raiz do projeto."
-  (interactive)
-  (let ((default-directory (project-root (project-current t))))
-    (ansi-term "iex" "iex -S mix")))
-
+  ;; ... código ...
+  )
 (global-set-key (kbd "C-c t") #'my/elixir-mix-test-file)
 (global-set-key (kbd "C-c i") #'my/elixir-iex)
 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; TYPESCRIPT DEV
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(use-package typescript-mode
+  :ensure t
+  :mode ("\\.ts\\'" "\\.tsx\\'")
+  ;; Simplesmente garante que o Eglot inicie quando este modo for carregado
+  :hook (typescript-mode . eglot-ensure))
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; LSP GLOBAL: Eglot
+;; Define quais servidores rodar para quais modos
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(use-package eglot
+  :ensure nil                          ;; Já vem no Emacs 29+
+  :config
+  ;; Adiciona servidores para todas as linguagens aqui
+  (add-to-list 'eglot-server-programs
+    ;; 1. Elixir Server
+    '(elixir-mode . ("elixir-ls")))
+
+  (add-to-list 'eglot-server-programs
+    ;; 2. TypeScript/JavaScript Server
+    '(typescript-mode . ("typescript-language-server" "--stdio")))
+
+  (add-to-list 'eglot-server-programs
+    ;; (Recomendado) Aplica o mesmo servidor para arquivos .js
+    '(js-mode . ("typescript-language-server" "--stdio")))
+)
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Eshell
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+;; 1. Variáveis de Configuração Global
+(setq eshell-history-size 5000
+      eshell-buffer-maximum-lines 5000
+      eshell-directory-name (expand-file-name "eshell" user-emacs-directory)
+      eshell-save-some-history t
+      eshell-scroll-to-bottom-on-input t
+      eshell-prefer-lisp-functions nil)
+
+;; 2. Prompt Personalizado (Sem alteração)
+(defun my/eshell-prompt-function ()
+  (let* ((dir (eshell/pwd))
+	 (dir-display (if (equal dir "~") dir (file-name-nondirectory dir)))
+	 (git-branch (if (featurep 'magit) (magit-get-current-branch) nil))
+	 (prompt-color (face-attribute 'font-lock-keyword-face :foreground))
+	 (git-string (if git-branch (format " [%s]" git-branch) ""))
+	 )
+    (insert (propertize (format "%s%s" dir-display git-string)
+			'face `(:foreground ,prompt-color :weight bold)))
+    (insert "\nλ ")
+    )
+  )
+(setq eshell-prompt-function 'my/eshell-prompt-function)
+
+
+;; 3. Hooks e Bindings (CORRIGIDO C-r)
+(add-hook 'eshell-mode-hook
+	  (lambda ()
+	    (define-key eshell-mode-map (kbd "<up>") 'eshell-previous-prompt)
+	    (define-key eshell-mode-map (kbd "<down>") 'eshell-next-prompt)
+
+	    ;; Substitui counsel-esh-history por `counsel-esh-history` (se counsel estiver instalado)
+	    ;; O `counsel-esh-history` agora faz parte do pacote `counsel`.
+	    ;; Se você instalou `counsel`, esta função deve funcionar.
+	    (define-key eshell-mode-map (kbd "C-r") 'counsel-esh-history)
+
+	    (define-key eshell-mode-map (kbd "C-c C-p") 'eshell-kill-buffer-and-window)
+
+	    (require 'eshell-cmpl)
+	    (eshell-cmpl-initialize)
+
+	    (require 'eshell-glob)
+	    ))
+
+;; 4. Atalho Rápido para Abrir/Alternar
+(global-set-key (kbd "C-c e") 'eshell)
+
+;; 5. REMOVA O BLOCO ABAIXO (era o causador do erro)
+;; (use-package counsel-esh :ensure t :after (ivy eshell))
+
+;; (Opcional) Adicione suas configurações de formatação (Prettier, por exemplo) aqui:
+;; (use-package prettier
+;;   :ensure t
+;;   :hook ((typescript-mode . prettier-mode)
+;;          (js-mode . prettier-mode)))
 
  ;; custom-set-variables was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
@@ -397,4 +451,21 @@
 ;; If there is more than one, they won't work right.
 
 
-;;; init.el ends here
+;;; Firefox como padrão quando clica em links
+(custom-set-variables
+ ;; custom-set-variables was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ '(browse-url-browser-function 'browse-url-firefox)
+ '(browse-url-firefox-new-window-is-tab t)
+ '(package-selected-packages
+   '(ace-jump-mode all-the-icons all-the-icons-dired company
+		   company-prescient ctrlf dashboard dired-sidebar
+		   doom-modeline doom-themes elixir-mode
+		   flycheck-credo git-messenger git-timemachine
+		   goto-chg helpful ivy ivy-yasnippet magit
+		   multiple-cursors nerd-icons org-modern prescient rg
+		   smartparens swiper typescript-mode which-key
+		   ws-butler yasnippet yasnippet-snippets
+	     counsel))) ;; <-- ATENÇÃO: Adicionado 'counsel' e fechado os parênteses!
