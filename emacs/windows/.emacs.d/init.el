@@ -40,6 +40,9 @@
 ;; visual-line-mode só em buffers de texto, não globalmente
 (add-hook 'text-mode-hook #'visual-line-mode)
 
+;; Sem bipe para combinações de teclas indefinidas
+(setq ring-bell-function 'ignore)
+
 ;; Sem backups (~) ou auto-save (#) no diretório atual
 (setq make-backup-files nil
       auto-save-default nil
@@ -245,9 +248,18 @@
 ;; GO (GOLANG)
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
+(defun go-run-current-file ()
+  "Run `go fmt` then `go run` on the current Go file."
+  (interactive)
+  (shell-command (concat "go fmt " (shell-quote-argument buffer-file-name) " && go run " (shell-quote-argument buffer-file-name))))
+
+(defun my/go-mode-hook ()
+  (local-set-key (kbd "C-c C-r") #'go-run-current-file))
+
 (use-package go-mode
   :mode ("\\.go\\'" . go-mode)
-  :hook (go-mode . eglot-ensure)
+  :hook ((go-mode . eglot-ensure)
+         (go-mode . my/go-mode-hook))
   :config
   (setq-default go-tab-width 4)
   (setq indent-tabs-mode t)
@@ -472,6 +484,15 @@
 ;; Melhora a renderização de ícones se você estiver usando nerd-icons/all-the-icons
 (setq-default use-fallback-font t)
 
+;; Auto-complete com Company (funciona com eglot/gopls via company-capf)
+(use-package company
+  :config
+  (global-company-mode 1)
+  (setq company-idle-delay 0.2
+        company-minimum-prefix-length 1
+        company-tooltip-limit 10
+        company-tooltip-align-annotations t))
+
 ;; Buffer-move: mover janela atual para cima/baixo/esquerda/direita
 (use-package buffer-move
   :ensure t
@@ -485,7 +506,15 @@
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
  '(browse-url-browser-function 'browse-url-firefox)
- '(package-selected-packages nil))
+ '(package-selected-packages
+   '(aio all-the-icons-dired buffer-move company-prescient copilot
+	 counsel ctrlf dashboard dired-sidebar django-mode
+	 docker-compose-mode dockerfile-mode doom-modeline doom-themes
+	 elixir-mode flycheck-credo flycheck-golangci-lint
+	 git-messenger git-timemachine go-mode goto-chg helpful magit
+	 markdown-mode mermaid-mode mpvi multiple-cursors
+	 nerd-icons-dired org-modern request rg smartparens
+	 typescript-mode web-mode ws-butler)))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
