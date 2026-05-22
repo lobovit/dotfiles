@@ -1,7 +1,8 @@
-;;; treesitter.el --- Tree-sitter para syntax highlighting moderna -*- lexical-binding: t; -*-
+;;; treesitter.el --- Tree-sitter para syntax highlighting (built-in) -*- lexical-binding: t; -*-
 
 (setq treesit-language-source-alist
       '((go . ("https://github.com/tree-sitter/tree-sitter-go"))
+        (gomod . ("https://github.com/camdencheek/tree-sitter-go-mod" "main" "grammar"))
         (typescript . ("https://github.com/tree-sitter/tree-sitter-typescript" "master" "typescript/src"))
         (tsx . ("https://github.com/tree-sitter/tree-sitter-typescript" "master" "tsx/src"))
         (javascript . ("https://github.com/tree-sitter/tree-sitter-javascript"))
@@ -10,53 +11,48 @@
         (json . ("https://github.com/tree-sitter/tree-sitter-json"))
         (yaml . ("https://github.com/tree-sitter-grammars/tree-sitter-yaml"))
         (bash . ("https://github.com/tree-sitter/tree-sitter-bash"))
-        (csharp . ("https://github.com/tree-sitter/tree-sitter-c-sharp"))))
+        (csharp . ("https://github.com/tree-sitter/tree-sitter-c-sharp"))
+        (dockerfile . ("https://github.com/camdencheek/tree-sitter-dockerfile"))
+        (markdown . ("https://github.com/tree-sitter-grammars/tree-sitter-markdown"))))
 
+;; ── Tree-sitter lang list (lang . file patterns) ───────────────────
 (defvar my/treesit-langs
-  '((go         go-mode          go-ts-mode)
-    (typescript typescript-mode  typescript-ts-mode)
-    (tsx        typescript-mode  typescript-ts-mode)
-    (javascript js-mode          js-ts-mode)
-    (css        css-mode         css-ts-mode)
-    (html       html-mode        html-ts-mode)
-    (json       json-mode        json-ts-mode)
-    (yaml       yaml-mode        yaml-ts-mode)
-    (bash       bash-mode        bash-ts-mode)
-    (csharp     csharp-mode      csharp-ts-mode))
-  "Lista de linguagens tree-sitter: (LANG LEGACY-MODE TS-MODE).")
+  '((go        ("\\.go\\'" . go-ts-mode)      ("go\\.mod\\'" . go-mod-ts-mode))
+    (typescript ("\\.ts\\'" . typescript-ts-mode)  ("\\.tsx\\'" . tsx-ts-mode))
+    (javascript ("\\.js\\'" . js-ts-mode)          ("\\.cjs\\'" . js-ts-mode) ("\\.mjs\\'" . js-ts-mode))
+    (css        ("\\.css\\'" . css-ts-mode))
+    (html       ("\\.html?\\'" . html-ts-mode))
+    (json       ("\\.json\\'" . json-ts-mode))
+    (yaml       ("\\.ya?ml\\'" . yaml-ts-mode))
+    (bash       ("\\.sh\\'" . bash-ts-mode)        ("\\.bash\\'" . bash-ts-mode))
+    (csharp     ("\\.cs\\'" . csharp-ts-mode))
+    (dockerfile ("Dockerfile\\'" . dockerfile-ts-mode) ("\\.dockerfile\\'" . dockerfile-ts-mode))
+    (markdown   ("\\.md\\'" . markdown-ts-mode)    ("\\.markdown\\'" . markdown-ts-mode))))
 
 (defun my/treesit-install-grammars ()
-  "Instala todas as gramaticas tree-sitter configuradas.
-Requer git e compilador C (MSYS2 + mingw-w64-x86_64-gcc no Windows)."
+  "Install all configured tree-sitter grammars."
   (interactive)
   (unless (executable-find "git")
-    (error "git nao encontrado no PATH -- necessario para clonar os repositorios"))
+    (error "git nao encontrado no PATH"))
   (dolist (entry my/treesit-langs)
-    (let ((lang (nth 0 entry)))
+    (let ((lang (car entry)))
       (unless (treesit-ready-p lang t)
         (condition-case err
             (treesit-install-language-grammar lang)
           (error (message "Falha ao instalar grammar %s: %s"
                           lang (error-message-string err))))))))
 
-;; ── Limpa remapeamentos residuais de ts-mode (defensivo) ──────────
-(dolist (ts '(go-ts-mode typescript-ts-mode js-ts-mode css-ts-mode
-              html-ts-mode json-ts-mode yaml-ts-mode bash-ts-mode
-              csharp-ts-mode))
-  (setq major-mode-remap-alist
-        (cl-remove ts major-mode-remap-alist :key #'cdr)))
+;; ── Register file patterns in auto-mode-alist ──────────────────────
+(dolist (entry my/treesit-langs)
+  (let ((lang (car entry))
+        (patterns (cdr entry)))
+    (dolist (pat patterns)
+      (let ((pattern (car pat))
+            (mode (cdr pat)))
+        (when (fboundp mode)
+          (add-to-list 'auto-mode-alist (cons pattern mode)))))))
 
-;; ── Adiciona remapeamento so se grammar carrega sem erro ──────────
-(when (fboundp 'treesit-ready-p)
-  (dolist (entry my/treesit-langs)
-    (let ((lang (nth 0 entry))
-          (legacy (nth 1 entry))
-          (ts-mode (nth 2 entry)))
-      (when (and (fboundp ts-mode)
-                 (ignore-errors (treesit-ready-p lang t)))
-        (add-to-list 'major-mode-remap-alist (cons legacy ts-mode))))))
-
-;; ── Suprime warnings de tree-sitter quando grammar nao existe ─────
+;; ── Enable tree-sitter modes by adding to auto-mode-alist directly ─
 (add-to-list 'warning-suppress-types 'treesit)
 
 (provide 'treesitter)

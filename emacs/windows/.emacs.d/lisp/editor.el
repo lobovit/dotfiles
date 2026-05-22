@@ -6,6 +6,7 @@
 (delete-selection-mode 1)
 (recentf-mode 1)
 (show-paren-mode 1)
+(savehist-mode 1)
 (add-hook 'text-mode-hook #'visual-line-mode)
 
 (setq ring-bell-function 'ignore)
@@ -22,47 +23,29 @@
       scroll-conservatively 101
       scroll-margin 2)
 
-;; ── Smartparens ────────────────────────────────────────────────────
-(use-package smartparens
-  :config
-  (require 'smartparens-config)
-  (smartparens-global-mode 1))
+(add-hook 'before-save-hook #'delete-trailing-whitespace)
 
-;; ── WS Butlet ──────────────────────────────────────────────────────
-(use-package ws-butler
-  :hook (prog-mode . ws-butler-mode)
-  :hook (text-mode . ws-butler-mode))
+;; ── Goto last change (usando marker ring) ──────────────────────────
+(defun my/goto-last-change ()
+  "Go to the last buffer change position using the mark ring."
+  (interactive)
+  (set-mark-command 1))
 
-;; ── Goto Last Change ───────────────────────────────────────────────
-(use-package goto-chg)
+(defun my/goto-last-change-reverse ()
+  "Go forward through the mark ring."
+  (interactive)
+  (set-mark-command 0))
 
-;; ── Multiple Cursors ───────────────────────────────────────────────
-(use-package multiple-cursors)
+;; ── Abbrev + Skeleton (substitui yasnippet) ────────────────────────
+(setq abbrev-file-name (expand-file-name "abbrev_defs" user-emacs-directory))
+(setq save-abbrevs 'silently)
 
-;; ── Ctrlf ─────────────────────────────────────────────────────────
-(use-package ctrlf
-  :config
-  (ctrlf-mode 1))
+(dolist (hook '(prog-mode-hook text-mode-hook org-mode-hook))
+  (add-hook hook (lambda () (setq local-abbrev-table (make-abbrev-table)))))
 
-;; ── Undo Tree ──────────────────────────────────────────────────────
-(use-package undo-tree
-  :init
-  (setq undo-tree-history-directory-alist
-        `(("." . ,(expand-file-name "undo-tree" user-emacs-directory))))
-  :config
-  (global-undo-tree-mode 1))
-
-;; ── Avy ────────────────────────────────────────────────────────────
-(use-package avy)
-
-;; ── Yasnippet ──────────────────────────────────────────────────────
-(use-package yasnippet
-  :config
-  (yas-global-mode 1))
-
-;; ── Org Modern ─────────────────────────────────────────────────────
-(use-package org-modern
-  :hook (org-mode . org-modern-mode))
+;; ── Enhance completion-at-point ─────────────────────────────────────
+(setq tab-always-indent 'complete
+      completion-cycle-threshold 3)
 
 (provide 'editor)
 ;;; editor.el ends here

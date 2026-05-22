@@ -1,77 +1,44 @@
-;;; completion.el --- Vertico, Consult, Orderless, Marginalia, Embark, Company -*- lexical-binding: t; -*-
+;;; completion.el --- Icomplete, Project, Ripgrep, Which-key -*- lexical-binding: t; -*-
 
-(use-package vertico
-  :init
-  (vertico-mode 1)
-  (setq vertico-cycle t))
+;; ── Icomplete vertical (built-in) ───────────────────────────────────
+(icomplete-vertical-mode 1)
+(setq icomplete-delay-completions-threshold 0
+      icomplete-compute-delay 0
+      icomplete-show-matches-on-no-input t
+      icomplete-scroll t
+      icomplete-hide-common-prefix nil
+      icomplete-prospects-height 20)
 
-(use-package orderless
-  :custom
-  (completion-styles '(orderless basic))
-  (completion-category-defaults nil)
-  (completion-category-overrides '((file (styles partial-completion)))))
+(setq completion-styles '(flex basic))
 
-(use-package marginalia
-  :bind (:map minibuffer-local-map
-              ("M-A" . marginalia-cycle))
-  :init
-  (marginalia-mode 1))
+(with-eval-after-load 'icomplete
+  (define-key icomplete-minibuffer-map (kbd "C-n") #'icomplete-forward-completions)
+  (define-key icomplete-minibuffer-map (kbd "C-p") #'icomplete-backward-completions)
+  (define-key icomplete-minibuffer-map (kbd "<down>") #'icomplete-forward-completions)
+  (define-key icomplete-minibuffer-map (kbd "<up>") #'icomplete-backward-completions)
+  (define-key icomplete-minibuffer-map (kbd "C-j") #'icomplete-force-complete-and-exit))
 
-(use-package embark
-  :bind (("C-." . embark-act)
-         ("C-;" . embark-dwim)
-         ("C-h B" . embark-bindings))
-  :init
-  (setq prefix-help-command #'embark-prefix-help-command)
-  :config
-  (add-to-list 'display-buffer-alist
-               '("\\`\\*Embark Collect \\(Live\\|Completions\\)\\*"
-                 (display-buffer-reuse-window display-buffer-in-side-window)
-                 (side . bottom)
-                 (window-height . 0.25))))
-
-(use-package consult
-  :bind (("C-x b" . consult-buffer)
-         ("C-x C-r" . consult-recent-file)
-         ("M-y" . consult-yank-pop)
-         ("M-g g" . consult-goto-line)
-         ("M-g M-g" . consult-goto-line))
-  :config
-  (setq consult-narrow-key "<"
-        consult-preview-key 'any
-        consult-ripgrep-args
-        "rg --null --line-buffered --color=never --max-columns=1000 --path-separator / --smart-case --no-heading --no-require-git --hidden --glob '!.git'"))
-
-(use-package embark-consult
-  :after (embark consult)
-  :hook (embark-collect-mode . consult-preview-at-point-mode))
-
-(use-package company
-  :config
-  (global-company-mode 1)
-  (setq company-idle-delay 0.2
-        company-minimum-prefix-length 1
-        company-tooltip-limit 10
-        company-tooltip-align-annotations t))
-
-(use-package helpful
-  :bind (("C-h f" . helpful-callable)
-         ("C-h v" . helpful-variable)
-         ("C-h k" . helpful-key)
-         ("C-h x" . helpful-command)))
-
-(use-package wgrep
-  :config
-  (setq wgrep-auto-save-buffer t))
-
-(use-package which-key
-  :config
+;; ── Which-key (built-in no Emacs 30+) ──────────────────────────────
+(when (fboundp 'which-key-mode)
   (which-key-mode 1)
   (setq which-key-idle-delay 0.8))
 
-(use-package projectile
-  :config
-  (projectile-mode 1))
+;; ── Project.el (built-in) ──────────────────────────────────────────
+(setq project-vc-extra-root-markers '("go.mod" ".project"))
+
+;; ── Ripgrep wrapper ────────────────────────────────────────────────
+(defun my/ripgrep (regexp)
+  "Search current project using ripgrep."
+  (interactive (list (read-regexp "Ripgrep: ")))
+  (let ((default-directory (or (cdr-safe (project-current))
+                               default-directory)))
+    (grep (format "rg -nH --no-heading --color=never --smart-case %s ."
+                  (shell-quote-argument regexp)))))
+
+;; ── Keybindings ────────────────────────────────────────────────────
+(global-set-key (kbd "C-x C-r") #'recentf-open-files)
+(global-set-key (kbd "M-g g")  #'goto-line)
+(global-set-key (kbd "M-g M-g") #'goto-line)
 
 (provide 'completion)
 ;;; completion.el ends here

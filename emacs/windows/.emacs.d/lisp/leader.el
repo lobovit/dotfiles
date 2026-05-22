@@ -1,69 +1,74 @@
-;;; leader.el --- Leader key (M-SPC) com general.el -*- lexical-binding: t; -*-
+;;; leader.el --- Leader key M-SPC (100% built-in) -*- lexical-binding: t; -*-
 
-(use-package general
-  :after which-key
-  :config
-  (general-override-mode 1)
-  (general-create-definer my/leader
-    :keymaps 'override
-    :prefix "M-SPC")
-  (my/leader
-   :which-key "leader"
-   ;; Arquivos e buffers
-   "." 'find-file
-   "," 'consult-buffer
-   "f f" 'find-file
-   "f r" 'consult-recent-file
-   "b b" 'consult-buffer
-   "b k" 'kill-this-buffer
-   ;; Busca
-   "/" 'consult-ripgrep
-   "s r" 'consult-ripgrep
-   "s l" 'consult-line
-   "s i" 'consult-imenu
-   ;; Janelas
-   "w /" 'split-window-right
-   "w -" 'split-window-below
-   "w d" 'delete-window
-   "w o" 'delete-other-windows
-   "w <left>" 'buf-move-left
-   "w <right>" 'buf-move-right
-   "w <up>" 'buf-move-up
-   "w <down>" 'buf-move-down
-   ;; Git
-   "g g" 'magit-status
-   "g l" 'my/magit-toggle-log
-   "g t" 'git-timemachine-toggle
-   "g p" 'git-messenger:popup-message
-   "g ," 'goto-last-change
-   "g ." 'goto-last-change-reverse
-   ;; Projeto
-   "p p" 'projectile-switch-project
-   "p f" 'projectile-find-file
-   ;; Layout e ferramentas
-   "TAB" 'my/open-workspace
-   "d" 'dirvish-side
-   "D" 'dashboard-open
-   "'" 'my/eshell-toggle
-   "e" 'my/eshell-toggle
-   "E" 'eval-buffer
-   "o" (lambda () (interactive) (opencode default-directory))
-   ;; Toggles
-   "t l" 'display-line-numbers-mode
-   "t n" 'display-line-numbers-mode
-   ;; Navegação visual
-   "j" 'avy-goto-char-timer
-   "l" 'avy-goto-line
-   ;; Multiple cursors
-   "m c" 'mc/edit-lines
-   "m n" 'mc/mark-next-like-this
-   "m p" 'mc/mark-previous-like-this
-   "m a" 'mc/mark-all-like-this
-   ;; Help
-   "h f" 'helpful-callable
-   "h v" 'helpful-variable
-   "h k" 'helpful-key
-   "h d" 'helpful-at-point))
+(defvar my/leader-map (make-sparse-keymap))
+(define-key global-map (kbd "M-SPC") my/leader-map)
+
+;; ── Arquivos e buffers ─────────────────────────────────────────────
+(define-key my/leader-map (kbd ".")     #'find-file)
+(define-key my/leader-map (kbd ",")     #'switch-to-buffer)
+(define-key my/leader-map (kbd "f f")   #'find-file)
+(define-key my/leader-map (kbd "f r")   #'recentf-open-files)
+(define-key my/leader-map (kbd "b b")   #'switch-to-buffer)
+(define-key my/leader-map (kbd "b k")   #'kill-current-buffer)
+
+;; ── Busca ──────────────────────────────────────────────────────────
+(define-key my/leader-map (kbd "/")     #'my/ripgrep)
+(define-key my/leader-map (kbd "s r")   #'my/ripgrep)
+(define-key my/leader-map (kbd "s l")   #'isearch-forward)
+(define-key my/leader-map (kbd "s i")   #'imenu)
+
+;; ── Janelas ────────────────────────────────────────────────────────
+(define-key my/leader-map (kbd "w /")   #'split-window-right)
+(define-key my/leader-map (kbd "w -")   #'split-window-below)
+(define-key my/leader-map (kbd "w d")   #'delete-window)
+(define-key my/leader-map (kbd "w o")   #'delete-other-windows)
+(define-key my/leader-map (kbd "w <left>")  #'my/buf-move-left)
+(define-key my/leader-map (kbd "w <right>") #'my/buf-move-right)
+(define-key my/leader-map (kbd "w <up>")    #'my/buf-move-up)
+(define-key my/leader-map (kbd "w <down>")  #'my/buf-move-down)
+
+;; ── Git (via vc built-in) ──────────────────────────────────────────
+(define-key my/leader-map (kbd "g g")   #'vc-dir)
+(define-key my/leader-map (kbd "g l")   #'my/vc-log-toggle)
+(define-key my/leader-map (kbd "g b")   #'my/vc-blame)
+(define-key my/leader-map (kbd "g s")   #'my/vc-stash)
+(define-key my/leader-map (kbd "g S")   #'my/vc-stash-pop)
+(define-key my/leader-map (kbd "g ,")   #'my/goto-last-change)
+(define-key my/leader-map (kbd "g .")   #'my/goto-last-change-reverse)
+
+;; ── Projeto ────────────────────────────────────────────────────────
+(define-key my/leader-map (kbd "p p")   #'project-switch-project)
+(define-key my/leader-map (kbd "p f")   #'project-find-file)
+
+;; ── Layout e ferramentas ───────────────────────────────────────────
+(define-key my/leader-map (kbd "<tab>") #'my/open-workspace)
+(define-key my/leader-map (kbd "d")     #'dired)
+(define-key my/leader-map (kbd "'")     #'my/eshell-toggle)
+(define-key my/leader-map (kbd "e")     #'my/eshell-toggle)
+(define-key my/leader-map (kbd "E")     #'eval-buffer)
+(define-key my/leader-map (kbd "o")     #'my/opencode)
+
+;; ── Toggles ────────────────────────────────────────────────────────
+(define-key my/leader-map (kbd "t l")   #'display-line-numbers-mode)
+(define-key my/leader-map (kbd "t n")   #'display-line-numbers-mode)
+
+;; ── Navegacao ──────────────────────────────────────────────────────
+(define-key my/leader-map (kbd "j")     #'my/ace-window)
+(define-key my/leader-map (kbd "l")     #'goto-line)
+
+;; ── Macros (substitui multiple-cursors) ────────────────────────────
+(define-key my/leader-map (kbd "m m")   #'kmacro-start-macro)
+(define-key my/leader-map (kbd "m e")   #'kmacro-end-macro)
+(define-key my/leader-map (kbd "m x")   #'kmacro-call-macro)
+
+;; ── Bookmarks ─────────────────────────────────────────────────────
+(define-key my/leader-map (kbd "n")     #'bookmark-jump)
+
+;; ── Help ───────────────────────────────────────────────────────────
+(define-key my/leader-map (kbd "h f")   #'describe-function)
+(define-key my/leader-map (kbd "h v")   #'describe-variable)
+(define-key my/leader-map (kbd "h k")   #'describe-key)
+(define-key my/leader-map (kbd "h d")   #'display-local-help)
 
 (provide 'leader)
 ;;; leader.el ends here

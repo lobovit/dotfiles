@@ -1,4 +1,4 @@
-;;; go.el --- Golang: gopls, eglot, flycheck -*- lexical-binding: t; -*-
+;;; go.el --- Golang com go-ts-mode (built-in) e eglot -*- lexical-binding: t; -*-
 
 (require 'cl-lib)
 (require 'subr-x)
@@ -37,47 +37,32 @@
     (eglot-code-actions (point-min) (point-max) nil "source.organizeImports" nil)))
 
 (defun my/go-mode-hook ()
+  (setq-local tab-width 4)
   (local-set-key (kbd "C-c C-r") #'go-run-current-file)
   (local-set-key (kbd "C-c C-b") #'my-go-build)
   (local-set-key (kbd "C-c C-t") #'my-go-test)
   (add-hook 'before-save-hook #'my/go-format-and-imports -10 t))
 
-(use-package go-mode
-  :mode ("\\.go\\'" . go-mode)
-  :hook ((go-mode . eglot-ensure)
-         (go-mode . my/go-mode-hook)
-         (go-ts-mode . eglot-ensure)
-         (go-ts-mode . my/go-mode-hook))
-  :config
-  (setq-default go-tab-width 4)
-  (setq indent-tabs-mode t)
-  (setq tab-width 4))
+(dolist (hook '(go-ts-mode-hook go-mod-ts-mode-hook))
+  (add-hook hook #'my/go-mode-hook))
 
-(use-package eglot
-  :ensure nil
-  :config
-  (with-no-warnings
-    (add-to-list 'eglot-server-programs '(go-mode . ("gopls")))
-    (add-to-list 'eglot-server-programs '(go-ts-mode . ("gopls")))
-    (add-to-list 'eglot-server-programs '(js-mode . ("typescript-language-server" "--stdio")))
-    (add-to-list 'eglot-server-programs '(typescript-mode . ("typescript-language-server" "--stdio")))
-    (add-to-list 'eglot-server-programs '(typescript-ts-mode . ("typescript-language-server" "--stdio")))
-    (add-to-list 'eglot-server-programs '(tsx-ts-mode . ("typescript-language-server" "--stdio")))
-    (add-to-list 'eglot-server-programs '(csharp-mode . ("OmniSharp.exe" "-lsp")))
-    (add-to-list 'eglot-server-programs '(csharp-ts-mode . ("OmniSharp.exe" "-lsp"))))
-  (setq-default eglot-workspace-configuration
-    '((:gopls .
-        ((staticcheck . t)
-         (matcher . "CaseSensitive"))))))
+;; ── Eglot (built-in) ───────────────────────────────────────────────
+(with-eval-after-load 'eglot
+  (add-to-list 'eglot-server-programs '(go-ts-mode . ("gopls")))
+  (add-to-list 'eglot-server-programs '(go-mod-ts-mode . ("gopls"))))
 
-(use-package flycheck
-  :config
-  (global-flycheck-mode t))
+(setq-default eglot-workspace-configuration
+  '((:gopls .
+      ((staticcheck . t)
+       (matcher . "CaseSensitive")))))
 
-(use-package flycheck-golangci-lint
-  :after (go-mode flycheck)
-  :hook (go-mode . flycheck-golangci-lint-setup)
-  :hook (go-ts-mode . flycheck-golangci-lint-setup))
+(add-hook 'go-ts-mode-hook #'eglot-ensure)
+(add-hook 'go-mod-ts-mode-hook #'eglot-ensure)
+
+;; ── Flymake ────────────────────────────────────────────────────────
+(global-set-key (kbd "C-c ! n") #'flymake-goto-next-error)
+(global-set-key (kbd "C-c ! p") #'flymake-goto-prev-error)
+(global-set-key (kbd "C-c ! l") #'flymake-show-buffer-diagnostics)
 
 (provide 'go)
 ;;; go.el ends here

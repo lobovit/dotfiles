@@ -1,10 +1,10 @@
 ;;; windows.el --- Gerenciamento de janelas e workspaces -*- lexical-binding: t; -*-
 
 (defun my/open-workspace ()
-  "Open my default workspace layout: sidebar left, current buffer center, opencode right, eshell bottom."
+  "Open my default workspace layout: dired left, code center, opencode right, eshell bottom."
   (interactive)
   (delete-other-windows)
-  (dirvish-side)
+  (dired default-directory)
   (other-window 1)
   (let ((main-win (selected-window)))
     (split-window-below)
@@ -13,23 +13,58 @@
     (select-window main-win)
     (split-window-right)
     (other-window 1)
-    (opencode default-directory)))
+    (my/opencode)))
 
-(use-package shackle
-  :config
-  (setq shackle-rules '(("*help*" :select t :size 0.3 :align bottom)
-                        ("*compilation*" :select t :size 0.3 :align bottom)
-                        ("*Messages*" :size 0.2 :align bottom)
-                        ("*xref*" :select t :size 0.4 :align bottom)
-                        ("*grep*" :select t :size 0.3 :align bottom)
-                        ("*Flycheck errors*" :select t :size 0.25 :align bottom)))
-  (shackle-mode 1))
+;; ── Tab bar (built-in) ─────────────────────────────────────────────
+(setq tab-bar-show 1
+      tab-bar-close-button-show nil
+      tab-bar-new-button-show nil
+      tab-bar-tab-hints t)
+(tab-bar-mode 1)
+(tab-bar-history-mode 1)
 
-(use-package persp-mode
-  :config
-  (persp-mode 1))
+;; ── Display buffer rules ───────────────────────────────────────────
+(add-to-list 'display-buffer-alist
+             '("\\`\\*Help\\*\\'"
+               (display-buffer-reuse-window display-buffer-in-side-window)
+               (side . bottom)
+               (window-height . 0.3)))
+(add-to-list 'display-buffer-alist
+             '("\\`\\*compilation\\*\\'"
+               (display-buffer-reuse-window display-buffer-in-side-window)
+               (side . bottom)
+               (window-height . 0.3)))
+(add-to-list 'display-buffer-alist
+             '("\\`\\*Messages\\*\\'"
+               (display-buffer-in-side-window)
+               (side . bottom)
+               (window-height . 0.2)))
+(add-to-list 'display-buffer-alist
+             '("\\`\\*xref\\*\\'"
+               (display-buffer-reuse-window display-buffer-in-side-window)
+               (side . bottom)
+               (window-height . 0.4)))
+(add-to-list 'display-buffer-alist
+             '("\\`\\*grep\\*\\'"
+               (display-buffer-reuse-window display-buffer-in-side-window)
+               (side . bottom)
+               (window-height . 0.3)))
 
-(use-package buffer-move)
+;; ── Buffer move (substitui buffer-move) ────────────────────────────
+(defun my/buf-move (dir)
+  "Swap current buffer with the buffer in DIR window."
+  (let ((other (windmove-find-other-window dir)))
+    (when other
+      (let ((buf (current-buffer))
+            (other-buf (window-buffer other)))
+        (set-window-buffer other buf)
+        (set-window-buffer (selected-window) other-buf)
+        (select-window other)))))
+
+(defun my/buf-move-left ()  (interactive) (my/buf-move 'left))
+(defun my/buf-move-right () (interactive) (my/buf-move 'right))
+(defun my/buf-move-up ()    (interactive) (my/buf-move 'up))
+(defun my/buf-move-down ()  (interactive) (my/buf-move 'down))
 
 (provide 'windows)
 ;;; windows.el ends here

@@ -1,19 +1,32 @@
-;;; ts.el --- TypeScript, JavaScript, Web mode -*- lexical-binding: t; -*-
+;;; ts.el --- TypeScript/JavaScript/HTML/CSS com tree-sitter (built-in) -*- lexical-binding: t; -*-
 
-(use-package typescript-mode
-  :mode ("\\.ts\\'" "\\.tsx\\'"))
+;; ── Tree-sitter modes sao configurados via auto-mode-alist em treesitter.el ──
+;; Aqui so configuramos indentacao e eglot
 
-(use-package web-mode
-  :mode (("\\.html?\\'" . web-mode)
-         ("\\.css\\'" . web-mode)
-         ("\\.jsx\\'" . web-mode))
-  :config
-  (setq web-mode-markup-indent-offset 2
-        web-mode-css-indent-offset 2
-        web-mode-code-indent-offset 2
-        web-mode-enable-auto-pairing t
-        web-mode-enable-auto-closing t
-        web-mode-enable-auto-quoting t))
+;; ── Indentacao ─────────────────────────────────────────────────────
+(dolist (hook '(typescript-ts-mode-hook tsx-ts-mode-hook
+               js-ts-mode-hook css-ts-mode-hook
+               html-ts-mode-hook json-ts-mode-hook))
+  (add-hook hook (lambda () (setq-local indent-tabs-mode nil
+                                        tab-width 2
+                                        standard-indent 2))))
+
+;; ── Eglot ──────────────────────────────────────────────────────────
+(with-eval-after-load 'eglot
+  (add-to-list 'eglot-server-programs
+               '(typescript-ts-mode . ("typescript-language-server" "--stdio")))
+  (add-to-list 'eglot-server-programs
+               '(tsx-ts-mode . ("typescript-language-server" "--stdio")))
+  (add-to-list 'eglot-server-programs
+               '(js-ts-mode . ("typescript-language-server" "--stdio")))
+  (add-to-list 'eglot-server-programs
+               '(html-ts-mode . ("vscode-html-language-server" "--stdio")))
+  (add-to-list 'eglot-server-programs
+               '(css-ts-mode . ("vscode-css-language-server" "--stdio"))))
+
+(add-hook 'typescript-ts-mode-hook #'eglot-ensure)
+(add-hook 'tsx-ts-mode-hook #'eglot-ensure)
+(add-hook 'js-ts-mode-hook #'eglot-ensure)
 
 (provide 'ts)
 ;;; ts.el ends here

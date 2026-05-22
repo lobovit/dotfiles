@@ -1,4 +1,4 @@
-;;; eshell.el --- Eshell -*- lexical-binding: t; -*-
+;;; eshell.el --- Eshell customization (built-in) -*- lexical-binding: t; -*-
 
 (defun my/eshell-toggle ()
   "Toggle eshell in a bottom window."
@@ -16,15 +16,13 @@
                         '(display-buffer-below-selected
                           . ((window-height . 0.25))))))))
 
-(use-package eshell
-  :ensure nil
-  :hook ((eshell-mode . (lambda ()
-                          (display-line-numbers-mode -1)
-                          (company-mode -1)
-                          (setq-local buffer-face-mode-face
-                                      (list :family "Consolas" :height 110))
-                          (buffer-face-mode 1))))
-  :config
+(with-eval-after-load 'eshell
+  (add-hook 'eshell-mode-hook
+            (lambda ()
+              (display-line-numbers-mode -1)
+              (setq-local buffer-face-mode-face
+                          (list :family "Consolas" :height 110))
+              (buffer-face-mode 1)))
   (setq eshell-prompt-function
         (lambda ()
           (concat "[" (user-real-login-name) "@"
