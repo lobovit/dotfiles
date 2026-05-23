@@ -39,22 +39,23 @@
   (setq vc-gutter--overlays nil))
 
 (defun vc-gutter--update ()
-  (vc-gutter--clear)
-  (let ((changes (vc-gutter--diff-lines)))
-    (save-excursion
-      (dolist (pair changes)
-        (let ((line (car pair))
-              (face (cdr pair)))
-          (goto-char (point-min))
-          (forward-line (1- line))
-          (let ((ov (make-overlay (point) (point))))
-            (overlay-put ov 'vc-gutter t)
-            (overlay-put ov 'before-string
-                         (propertize " " 'face face
-                                     'display '(left-fringe
-                                                filled-rectangle
-                                                vc-gutter-modified)))
-            (push ov vc-gutter--overlays)))))))
+  (when buffer-file-name
+    (vc-gutter--clear)
+    (let ((changes (vc-gutter--diff-lines)))
+      (save-excursion
+        (dolist (pair changes)
+          (let ((line (car pair))
+                (face (cdr pair)))
+            (goto-char (point-min))
+            (forward-line (1- line))
+            (let ((ov (make-overlay (point) (point))))
+              (overlay-put ov 'vc-gutter t)
+              (overlay-put ov 'before-string
+                           (propertize " " 'face face
+                                       'display '(left-fringe
+                                                  filled-rectangle
+                                                  vc-gutter-modified)))
+              (push ov vc-gutter--overlays))))))))
 
 (defun vc-gutter--after-save ()
   (when vc-gutter-mode

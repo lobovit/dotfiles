@@ -1,5 +1,7 @@
 ;;; treesitter.el --- Tree-sitter para syntax highlighting (built-in) -*- lexical-binding: t; -*-
 
+(require 'treesit)
+
 (setq treesit-language-source-alist
       '((go . ("https://github.com/tree-sitter/tree-sitter-go"))
         (gomod . ("https://github.com/camdencheek/tree-sitter-go-mod" "main" "grammar"))
@@ -53,7 +55,6 @@
           (add-to-list 'auto-mode-alist (cons pattern mode)))))))
 
 ;; ── Enable tree-sitter modes by adding to auto-mode-alist directly ─
-(add-to-list 'warning-suppress-types 'treesit)
 
 (provide 'treesitter)
 ;;; treesitter.el ends here

@@ -1,0 +1,225 @@
+#+TITLE: Tutorial Emacs — scovl config (100% built-in)
+
+Configuracao modular, zero pacotes externos. Tudo built-in ou codigo proprio em =lisp/=.
+
+-----
+
+* 1. Leader Key =M-SPC= (hub central)
+
+Aguarde 0.8s apos =M-SPC= para ver o which-key com todas as opcoes.
+
+** Arquivos e Buffers
+
+| Atalho               | Acao                                 |
+|----------------------+--------------------------------------|
+| =M-SPC .= / =M-SPC f f= | Find file (abrir arquivo do projeto) |
+| =M-SPC ,= / =M-SPC b b= | Switch buffer (alternar entre abertos) |
+| =M-SPC f r=          | Recent files (reabrir arquivos recentes) |
+| =M-SPC b k=          | Kill buffer (fechar arquivo atual)   |
+
+** Busca
+
+| Atalho               | Acao                                 |
+|----------------------+--------------------------------------|
+| =M-SPC /= / =M-SPC s r= | Ripgrep no projeto (requer =rg= no PATH) |
+| =M-SPC s l=          | Isearch (busca no buffer atual)      |
+| =M-SPC s i=          | Imenu (navegar por funcoes/simbolos) |
+
+** Janelas
+
+| Atalho          | Acao                           |
+|-----------------+--------------------------------|
+| =M-SPC w /=     | Split vertical                 |
+| =M-SPC w -=     | Split horizontal               |
+| =M-SPC w d=     | Fechar painel atual            |
+| =M-SPC w o=     | Fechar outros paineis          |
+| =M-SPC w <left/right/up/down>= | Mover buffer entre paineis |
+
+** Git (VC built-in)
+
+| Atalho          | Acao                                   |
+|-----------------+----------------------------------------|
+| =M-SPC g g=     | VC dir (status: stage, commit, push)   |
+| =M-SPC g l=     | Toggle VC log                          |
+| =M-SPC g b=     | VC blame (git blame)                   |
+| =M-SPC g s=     | Stash                                  |
+| =M-SPC g S=     | Stash pop                              |
+| =M-SPC g ,=     | Ultima alteracao (goto-last-change)    |
+| =M-SPC g .=     | Avancar alteracoes                     |
+
+** Projeto
+
+| Atalho          | Acao                |
+|-----------------+---------------------|
+| =M-SPC p p=     | Project switch      |
+| =M-SPC p f=     | Project find file   |
+
+** Workspace
+
+| Atalho                | Acao                                                             |
+|-----------------------+------------------------------------------------------------------|
+| =M-SPC TAB=           | Open workspace (dired left + code center + opencode right + eshell bottom) |
+| =M-SPC d=             | Dired (explorador de arquivos)                                   |
+| =M-SPC '= / =M-SPC e= | Toggle eshell (terminal embutido)                                |
+| =M-SPC o=             | OpenCode (assistente de IA)                                      |
+
+** Edicao
+
+| Atalho                | Acao                                      |
+|-----------------------+-------------------------------------------|
+| =M-SPC j=             | Ace-window (saltar para qualquer janela)  |
+| =M-SPC l=             | Goto line                                 |
+| =M-SPC m m=           | Iniciar macro (substitui multiple-cursors) |
+| =M-SPC m e=           | Finalizar macro                           |
+| =M-SPC m x=           | Executar macro                            |
+| =M-SPC t l= / =M-SPC t n= | Toggle line numbers                  |
+| =M-SPC E=             | Eval buffer                               |
+
+** Ajuda
+
+| Atalho          | Acao                  |
+|-----------------+-----------------------|
+| =M-SPC h f=     | Describe function     |
+| =M-SPC h v=     | Describe variable     |
+| =M-SPC h k=     | Describe key          |
+| =M-SPC h d=     | Display local help    |
+| =M-SPC n=       | Bookmark jump         |
+
+-----
+
+* 2. Teclas Padrao do Emacs (uteis)
+
+| Tecla             | Acao                    |
+|-------------------+-------------------------|
+| =C-x b=           | Switch buffer           |
+| =C-x C-r=         | Recent files            |
+| =C-x C-f=         | Find file               |
+| =C-x C-s=         | Save buffer             |
+| =C-x k=           | Kill buffer             |
+| =C-x 2=           | Split below             |
+| =C-x 3=           | Split right             |
+| =C-x 0=           | Delete window           |
+| =C-x 1=           | Delete other windows    |
+| =M-g g=           | Goto line               |
+| =C-s=             | Isearch forward         |
+| =C-r=             | Isearch backward        |
+| =M-.=             | Xref: go to definition  |
+| =M-,=             | Xref: go back           |
+| =C-_= / =C-x u=   | Undo                    |
+
+-----
+
+* 3. Help / Documentacao
+
+| Tecla     | Acao               |
+|-----------+--------------------|
+| =C-h f=   | Describe function  |
+| =C-h v=   | Describe variable  |
+| =C-h k=   | Describe key       |
+| =C-h m=   | Describe mode      |
+
+-----
+
+* 4. Por Linguagem
+
+** Go
+- Tree-sitter via =go-ts-mode=, =go-mod-ts-mode=
+- Abbrev + Skeleton para snippets (substitui yasnippet)
+
+** C#
+- Tree-sitter via =csharp-ts-mode=
+
+** TypeScript / JavaScript
+- Tree-sitter via =typescript-ts-mode=, =tsx-ts-mode=, =js-ts-mode=
+
+** Markdown
+- Tree-sitter via =markdown-ts-mode=
+- Mermaid: =C-c C-c= compila diagrama
+
+** Docker
+- Tree-sitter via =dockerfile-ts-mode=
+
+** YAML / JSON / HTML / CSS / Bash
+- Tree-sitter via modos =*-ts-mode= correspondentes
+
+-----
+
+* 5. Completions (Icomplete vertical, built-in)
+
+No minibuffer, digite palavras-chave separadas por espaco com =completion-styles= = =flex=.
+
+- =C-n= / =C-p= — navegar entre opcoes
+- =C-j= — confirmar selecao e sair
+- =RET= — confirmar input
+
+-----
+
+* 6. Dicas de Uso Diario
+
+** Git (VC built-in)
+=M-SPC g g= abre o VC dir. Comandos uteis:
+- =m= — mark file
+- =s= — stage (git add)
+- =v= — commit (escreve mensagem, =C-c C-c= confirma)
+- =P= — push
+- =d= — diff
+- =l= — log
+
+#+BEGIN_QUOTE
+Fluxo tipico: =g g= → =m= (marca tudo) → =s= (stage) → =v= (commit) → =P= (push).
+#+END_QUOTE
+
+** Icomplete
+=icomplete-vertical-mode= mostra opcoes em lista vertical. =flex= matching permite digitar partes do nome em qualquer ordem.
+
+** VC Gutter
+Indicadores de diff no fringe (verde = adicionado, vermelho = removido, amarelo = modificado). Ativo em =prog-mode=.
+
+** HL-Todo
+Destaca TODO, FIXME, HACK, NOTE, XXX, BUG em comentarios. Ativo em =prog-mode= e =text-mode=.
+
+** Ace Window
+=M-SPC j= mostra letras sobre cada janela — pressione a letra para saltar.
+
+** Tree-sitter
+=M-x my/treesit-install-grammars= instala todas as gramaticas configuradas.
+
+** Eshell
+=M-SPC e= abre/fecha terminal. Prompt customizado, history persistente, comandos visuais configurados.
+
+** OpenCode
+- =M-x opencode= — inicia uma sessao no diretorio do projeto atual.
+- =M-x opencode-ask= — cria sessao e envia prompt direto.
+- =M-x opencode-ask-contextual= — envia prompt com contexto do buffer.
+
+-----
+
+* 7. Arquivos de Config
+
+| Arquivo                   | Conteudo                                                          |
+|---------------------------+-------------------------------------------------------------------|
+| =init.el=                 | Carregador principal, performance, encoding                       |
+| =lisp/editor.el=          | Comportamento basico: eletric-pair, savehist, recentf, abbrev     |
+| =lisp/ui.el=              | Tema Modus Vivendi, dired, mode-line, VC gutter                   |
+| =lisp/completion.el=      | Icomplete vertical, project.el, ripgrep, which-key                |
+| =lisp/windows.el=         | Display buffer rules, buffer-move, workspace                      |
+| =lisp/leader.el=          | Leader key =M-SPC=                                                |
+| =lisp/ace-window.el=      | Salto rapido entre janelas (implementacao propria)                |
+| =lisp/hl-todo.el=         | Highlight TODO/FIXME (implementacao propria)                      |
+| =lisp/vc-gutter.el=       | Indicadores git diff no fringe (implementacao propria)            |
+| =lisp/treesitter.el=      | Tree-sitter grammars e modos                                      |
+| =lisp/request-shim.el=    | Shim do request.el (built-in) para o emacs-opencode               |
+| =lisp/tools/git.el=       | VC: log toggle, blame, stash, push, pull                          |
+| =lisp/tools/ai.el=        | OpenCode: integracao com emacs-opencode                           |
+| =lisp/tools/eshell.el=    | Eshell customizado                                                |
+| =lisp/langs/go.el=        | Go: tree-sitter                                                   |
+| =lisp/langs/ts.el=        | TypeScript: tree-sitter, web-mode fallback                        |
+| =lisp/langs/csharp.el=    | C#: tree-sitter                                                   |
+| =lisp/langs/markdown.el=  | Markdown: tree-sitter + Mermaid                                   |
+| =lisp/langs/docker.el=    | Dockerfile: tree-sitter                                           |
+
+-----
+
+#+BEGIN_QUOTE
+Dica: =M-SPC= + esperar mostra o which-key com todas as opcoes disponiveis. Explore sem medo.
+#+END_QUOTE
