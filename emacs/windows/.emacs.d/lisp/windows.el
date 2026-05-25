@@ -49,6 +49,28 @@
                (display-buffer-reuse-window display-buffer-in-side-window)
                (side . bottom)
                (window-height . 0.3)))
+(add-to-list 'display-buffer-alist
+             '("\\` \\*dired-sidebar\\*\\'"
+               (display-buffer-reuse-window display-buffer-in-side-window)
+               (side . left)
+               (window-width . 30)))
+
+;; ── Dired sidebar toggle ──────────────────────────────────────────
+(defvar my/dired-sidebar-buffer-name " *dired-sidebar*")
+
+(defun my/dired-sidebar-toggle ()
+  "Toggle a Dired sidebar on the left side of the frame."
+  (interactive)
+  (let ((win (get-buffer-window my/dired-sidebar-buffer-name)))
+    (if win
+        (delete-window win)
+      (let ((buf (or (get-buffer my/dired-sidebar-buffer-name)
+                     (let ((dir (or (cdr-safe (project-current))
+                                    default-directory)))
+                       (dired dir)))))
+        (with-current-buffer buf
+          (rename-buffer my/dired-sidebar-buffer-name))
+        (display-buffer-in-side-window buf '((side . left) (window-width . 30)))))))
 
 ;; ── Buffer move (substitui buffer-move) ────────────────────────────
 (defun my/buf-move (dir)

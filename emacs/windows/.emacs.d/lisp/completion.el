@@ -18,6 +18,21 @@
   (define-key icomplete-minibuffer-map (kbd "<up>") #'icomplete-backward-completions)
   (define-key icomplete-minibuffer-map (kbd "C-j") #'icomplete-force-complete-and-exit))
 
+;; ── Company mode (autocomplete popup, vendored) ──────────────────
+(add-to-list 'load-path my/lisp-dir)
+(load (expand-file-name "company" my/lisp-dir) nil 'nomessage)
+(setq company-idle-delay 0.2
+      company-minimum-prefix-length 1
+      company-show-quick-access t
+      company-tooltip-align-annotations t
+      company-require-match nil
+      company-dabbrev-ignore-case 'keep-prefix
+      company-dabbrev-downcase nil
+      company-backends '((company-capf :separate)
+                         company-dabbrev-code
+                         company-dabbrev))
+(global-company-mode 1)
+
 ;; ── Which-key (built-in no Emacs 30+) ──────────────────────────────
 (when (fboundp 'which-key-mode)
   (which-key-mode 1)

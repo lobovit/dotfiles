@@ -49,6 +49,7 @@
 (define-key my/leader-map (kbd "o")     #'my/opencode)
 
 ;; ── Toggles ────────────────────────────────────────────────────────
+(define-key my/leader-map (kbd "t d")   #'my/dired-sidebar-toggle)
 (define-key my/leader-map (kbd "t l")   #'display-line-numbers-mode)
 (define-key my/leader-map (kbd "t n")   #'display-line-numbers-mode)
 
