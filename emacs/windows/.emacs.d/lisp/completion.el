@@ -9,7 +9,8 @@
       icomplete-hide-common-prefix nil
       icomplete-prospects-height 20)
 
-(setq completion-styles '(flex basic))
+(setq completion-styles '(flex basic)
+      completion-ignore-case t)
 
 (with-eval-after-load 'icomplete
   (define-key icomplete-minibuffer-map (kbd "C-n") #'icomplete-forward-completions)
@@ -18,20 +19,47 @@
   (define-key icomplete-minibuffer-map (kbd "<up>") #'icomplete-backward-completions)
   (define-key icomplete-minibuffer-map (kbd "C-j") #'icomplete-force-complete-and-exit))
 
-;; ── Company mode (autocomplete popup, vendored) ──────────────────
-(add-to-list 'load-path my/lisp-dir)
-(load (expand-file-name "company" my/lisp-dir) nil 'nomessage)
-(setq company-idle-delay 0.2
-      company-minimum-prefix-length 1
-      company-show-quick-access t
-      company-tooltip-align-annotations t
-      company-require-match nil
-      company-dabbrev-ignore-case 'keep-prefix
-      company-dabbrev-downcase nil
-      company-backends '((company-capf :separate)
-                         company-dabbrev-code
-                         company-dabbrev))
-(global-company-mode 1)
+;; ── Completion preview (built-in Emacs 30+, ghost text) ─────────
+(global-completion-preview-mode 1)
+(setq completion-preview-idle-delay 0.3
+      completion-preview-minimum-prefix-length 2)
+
+;; ── Dabbrev capf fallback (replaces ispell + company-dabbrev) ──
+(defun my/dabbrev-capf ()
+  "Completion-at-point function using dynamic abbreviation."
+  (when-let* ((bounds (bounds-of-thing-at-point 'symbol))
+              (prefix (buffer-substring-no-properties
+                       (car bounds) (cdr bounds)))
+              ((>= (length prefix) 2)))
+    (let ((candidates nil)
+          (seen (make-hash-table :test 'equal))
+          (regexp (concat "\\_<" (regexp-quote prefix) "\\sw+\\_>"))
+          (deadline (+ (float-time) 0.15)))
+      (save-excursion
+        (dolist (buf (buffer-list))
+          (when (> (float-time) deadline)
+            (cl-return))
+          (unless (string-prefix-p " " (buffer-name buf))
+            (with-current-buffer buf
+              (save-excursion
+                (goto-char (point-min))
+                (while (and (< (float-time) deadline)
+                            (re-search-forward regexp nil t))
+                  (let ((match (match-string 0)))
+                    (unless (gethash match seen)
+                      (puthash match t seen)
+                      (push match candidates)))))))))
+      (when candidates
+        (list (car bounds) (cdr bounds)
+              (nreverse candidates))))))
+
+(add-hook 'completion-at-point-functions #'my/dabbrev-capf -90)
+
+;; ── Ispell: suppress broken word-list lookup on Windows ──────
+(add-hook 'text-mode-hook
+          (lambda ()
+            (remove-hook 'completion-at-point-functions
+                         'ispell-completion-at-point t)))
 
 ;; ── Which-key (built-in no Emacs 30+) ──────────────────────────────
 (when (fboundp 'which-key-mode)

@@ -10,7 +10,7 @@
 (defvar-local vc-gutter--overlays nil)
 
 (defun vc-gutter--diff-lines ()
-  (when (and buffer-file-name
+  (when (and (stringp buffer-file-name)
              (executable-find "git")
              (vc-backend buffer-file-name))
     (with-temp-buffer
@@ -39,7 +39,7 @@
   (setq vc-gutter--overlays nil))
 
 (defun vc-gutter--update ()
-  (when buffer-file-name
+  (when (stringp buffer-file-name)
     (vc-gutter--clear)
     (let ((changes (vc-gutter--diff-lines)))
       (save-excursion
@@ -59,16 +59,25 @@
 
 (defun vc-gutter--after-save ()
   (when vc-gutter-mode
-    (run-with-idle-timer 0.3 nil #'vc-gutter--update)))
+    (let ((buf (current-buffer)))
+      (run-with-idle-timer 0.3 nil
+                           (lambda ()
+                             (when (buffer-live-p buf)
+                               (with-current-buffer buf
+                                 (vc-gutter--update))))))))
 
 (define-minor-mode vc-gutter-mode
   "Show git diff indicators in the fringe."
   :lighter " VCG"
   (if vc-gutter-mode
-      (progn
+      (let ((buf (current-buffer)))
         (add-hook 'after-save-hook #'vc-gutter--after-save nil t)
         (add-hook 'find-file-hook #'vc-gutter--update nil t)
-        (run-with-idle-timer 0.3 nil #'vc-gutter--update))
+        (run-with-idle-timer 0.3 nil
+                             (lambda ()
+                               (when (buffer-live-p buf)
+                                 (with-current-buffer buf
+                                   (vc-gutter--update))))))
     (vc-gutter--clear)
     (remove-hook 'after-save-hook #'vc-gutter--after-save t)
     (remove-hook 'find-file-hook #'vc-gutter--update t)))
