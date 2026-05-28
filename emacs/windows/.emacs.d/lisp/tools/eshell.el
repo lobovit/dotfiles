@@ -19,36 +19,43 @@
 (with-eval-after-load 'eshell
   (add-hook 'eshell-mode-hook
             (lambda ()
+              (company-mode -1)
               (display-line-numbers-mode -1)
               (setq-local buffer-face-mode-face
-                          (list :family "Consolas" :height 110))
+                          (list :family "Consolas" :height 140))
               (buffer-face-mode 1)))
   (setq eshell-prompt-function
         (lambda ()
-          (concat "[" (user-real-login-name) "@"
-                  (car (split-string (system-name) "\\."))
-                  " " (abbreviate-file-name default-directory)
-                  "]$\n"))
-        eshell-highlight-prompt t
-        eshell-prompt-regexp "^[^$#\n]*[$#] ?"
-        eshell-scroll-to-bottom-on-input 'all
-        eshell-scroll-show-maximum-output t
-        eshell-hist-ignoredups t
-        eshell-save-history-on-exit t
-        eshell-error-if-no-glob nil
-        eshell-glob-case-insensitive t
-        eshell-cp-interactive-query t
-        eshell-mv-interactive-query t
-        eshell-rm-interactive-query t
-        eshell-ln-interactive-query t
-        eshell-plain-echo-behavior t
-        eshell-destroy-buffer-when-process-dies nil
-        eshell-ask-to-save-history 'always
-        eshell-list-files-after-cd t
-        eshell-cmpl-cycle-completions nil
-        eshell-cmpl-autolist t
-        eshell-visual-commands '("htop" "top" "less" "more" "nano" "vim" "vi" "emacs")
-        eshell-visual-subcommands '("git" "log" "diff" "show")))
+          (concat (propertize
+                   (concat (user-real-login-name) "@"
+                           (car (split-string (system-name) "\\.")))
+                   'font-lock-face '(:foreground "#a6e3a1"))
+                  " "
+                  (propertize (abbreviate-file-name default-directory)
+                              'font-lock-face '(:foreground "#89b4fa"))
+                  (propertize " $" 'font-lock-face '(:foreground "#f38ba8"))
+                  " "))
+         eshell-prompt-regexp "^[^$#\n]*[$#] "
+         eshell-highlight-prompt t
+         eshell-scroll-to-bottom-on-input 'all
+         eshell-scroll-show-maximum-output t
+         eshell-hist-ignoredups t
+         eshell-save-history-on-exit t
+         eshell-error-if-no-glob nil
+         eshell-glob-case-insensitive t
+         eshell-cp-interactive-query t
+         eshell-mv-interactive-query t
+         eshell-rm-interactive-query t
+         eshell-ln-interactive-query t
+         eshell-plain-echo-behavior t
+         eshell-destroy-buffer-when-process-dies nil
+         eshell-ask-to-save-history 'always
+         eshell-list-files-after-cd t
+         eshell-cmpl-cycle-completions nil
+         eshell-cmpl-autolist t
+         eshell-banner-message ""
+         eshell-visual-commands '("htop" "top" "less" "more" "nano" "vim" "vi" "emacs")
+         eshell-visual-subcommands '("git" "log" "diff" "show")))
 
 (provide 'eshell)
 ;;; eshell.el ends here
