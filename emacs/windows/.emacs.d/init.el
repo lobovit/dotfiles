@@ -22,12 +22,27 @@
 (set-file-name-coding-system 'utf-8-unix)
 (modify-coding-system-alist 'process "*" 'utf-8)
 
+;; ── Package system (built-in, GNU ELPA only) ──────────────────────
+(require 'package)
+(add-to-list 'package-archives '("gnu" . "https://elpa.gnu.org/packages/"))
+(setq package-install-upgrade-built-in t)
+(package-initialize)
+(unless package-archive-contents
+  (package-refresh-contents))
+(unless (package-installed-p 'consult)
+  (package-install 'consult))
+
 ;; ── Load Modules ───────────────────────────────────────────────────
 (defvar my/lisp-dir (expand-file-name "lisp" user-emacs-directory))
 
 (defun my/load (file)
   "Load a config FILE from lisp/ directory."
   (load (expand-file-name file my/lisp-dir) nil 'nomessage))
+
+(require 'consult)
+(setq consult-ripgrep-args
+      "rg --null --color=never --no-heading --line-number --smart-case --max-columns=1000")
+(add-hook 'completion-list-mode-hook #'consult-preview-at-point-mode)
 
 (my/load "editor")
 (my/load "ace-window")
@@ -42,7 +57,6 @@
 (my/load "langs/markdown")
 (my/load "langs/docker")
 (my/load "tools/git")
-(my/load "tools/ai")
 (my/load "tools/eshell")
 
 (my/load "leader")

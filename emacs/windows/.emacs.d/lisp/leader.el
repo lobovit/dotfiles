@@ -5,17 +5,17 @@
 
 ;; ── Arquivos e buffers ─────────────────────────────────────────────
 (define-key my/leader-map (kbd ".")     #'find-file)
-(define-key my/leader-map (kbd ",")     #'switch-to-buffer)
+(define-key my/leader-map (kbd ",")     #'consult-buffer)
 (define-key my/leader-map (kbd "f f")   #'find-file)
 (define-key my/leader-map (kbd "f r")   #'recentf-open-files)
-(define-key my/leader-map (kbd "b b")   #'switch-to-buffer)
+(define-key my/leader-map (kbd "b b")   #'consult-buffer)
 (define-key my/leader-map (kbd "b k")   #'kill-current-buffer)
 
 ;; ── Busca ──────────────────────────────────────────────────────────
-(define-key my/leader-map (kbd "/")     #'my/ripgrep)
-(define-key my/leader-map (kbd "s r")   #'my/ripgrep)
-(define-key my/leader-map (kbd "s l")   #'isearch-forward)
-(define-key my/leader-map (kbd "s i")   #'imenu)
+(define-key my/leader-map (kbd "/")     #'consult-ripgrep)
+(define-key my/leader-map (kbd "s r")   #'consult-ripgrep)
+(define-key my/leader-map (kbd "s l")   #'consult-line)
+(define-key my/leader-map (kbd "s i")   #'consult-imenu)
 
 ;; ── Janelas ────────────────────────────────────────────────────────
 (define-key my/leader-map (kbd "w /")   #'split-window-right)
@@ -46,7 +46,6 @@
 (define-key my/leader-map (kbd "'")     #'my/eshell-toggle)
 (define-key my/leader-map (kbd "e")     #'my/eshell-toggle)
 (define-key my/leader-map (kbd "E")     #'eval-buffer)
-(define-key my/leader-map (kbd "o")     #'my/opencode)
 
 ;; ── Toggles ────────────────────────────────────────────────────────
 (define-key my/leader-map (kbd "t d")   #'my/dired-sidebar-toggle)
@@ -55,7 +54,7 @@
 
 ;; ── Navegacao ──────────────────────────────────────────────────────
 (define-key my/leader-map (kbd "j")     #'my/ace-window)
-(define-key my/leader-map (kbd "l")     #'goto-line)
+(define-key my/leader-map (kbd "l")     #'consult-goto-line)
 
 ;; ── Macros (substitui multiple-cursors) ────────────────────────────
 (define-key my/leader-map (kbd "m m")   #'kmacro-start-macro)
@@ -63,7 +62,7 @@
 (define-key my/leader-map (kbd "m x")   #'kmacro-call-macro)
 
 ;; ── Bookmarks ─────────────────────────────────────────────────────
-(define-key my/leader-map (kbd "n")     #'bookmark-jump)
+(define-key my/leader-map (kbd "n")     #'consult-bookmark)
 
 ;; ── Help ───────────────────────────────────────────────────────────
 (define-key my/leader-map (kbd "h f")   #'describe-function)

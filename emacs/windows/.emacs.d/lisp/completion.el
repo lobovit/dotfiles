@@ -1,6 +1,6 @@
-;;; completion.el --- Icomplete, Project, Ripgrep, Which-key -*- lexical-binding: t; -*-
+;;; completion.el --- Icomplete, Company, Project, Ripgrep, Which-key, Consult -*- lexical-binding: t; -*-
 
-;; ── Icomplete vertical (built-in) ───────────────────────────────────
+;; -- Icomplete vertical (built-in) -----------------------------------
 (icomplete-vertical-mode 1)
 (setq icomplete-delay-completions-threshold 0
       icomplete-compute-delay 0
@@ -18,7 +18,7 @@
   (define-key icomplete-minibuffer-map (kbd "<up>") #'icomplete-backward-completions)
   (define-key icomplete-minibuffer-map (kbd "C-j") #'icomplete-force-complete-and-exit))
 
-;; ── Company mode (autocomplete popup, vendored) ──────────────────
+;; -- Company mode (autocomplete popup, vendored) ---------------------
 (add-to-list 'load-path my/lisp-dir)
 (load (expand-file-name "company" my/lisp-dir) nil 'nomessage)
 (setq company-idle-delay 0.2
@@ -33,15 +33,15 @@
                          company-dabbrev))
 (global-company-mode 1)
 
-;; ── Which-key (built-in no Emacs 30+) ──────────────────────────────
+;; -- Which-key (built-in on Emacs 30+) -------------------------------
 (when (fboundp 'which-key-mode)
   (which-key-mode 1)
   (setq which-key-idle-delay 0.8))
 
-;; ── Project.el (built-in) ──────────────────────────────────────────
+;; -- Project.el (built-in) -------------------------------------------
 (setq project-vc-extra-root-markers '("go.mod" ".project"))
 
-;; ── Ripgrep wrapper ────────────────────────────────────────────────
+;; -- Ripgrep wrapper -------------------------------------------------
 (defun my/ripgrep (regexp)
   "Search current project using ripgrep."
   (interactive (list (read-regexp "Ripgrep: ")))
@@ -50,10 +50,12 @@
     (grep (format "rg -nH --no-heading --color=never --smart-case %s ."
                   (shell-quote-argument regexp)))))
 
-;; ── Keybindings ────────────────────────────────────────────────────
+;; -- Consult (GNU ELPA) -- settings applied in init.el ---------------
+
+;; -- Keybindings -----------------------------------------------------
 (global-set-key (kbd "C-x C-r") #'recentf-open-files)
-(global-set-key (kbd "M-g g")  #'goto-line)
-(global-set-key (kbd "M-g M-g") #'goto-line)
+(global-set-key (kbd "M-g g")   #'consult-goto-line)
+(global-set-key (kbd "M-g M-g") #'consult-goto-line)
 
 (provide 'completion)
 ;;; completion.el ends here
