@@ -1,22 +1,18 @@
-;;; completion.el --- Icomplete, Company, Project, Ripgrep, Which-key, Consult -*- lexical-binding: t; -*-
+;;; completion.el --- Vertico, Orderless, Consult, Company, Which-key -*- lexical-binding: t; -*-
 
-;; -- Icomplete vertical (built-in) -----------------------------------
-(icomplete-vertical-mode 1)
-(setq icomplete-delay-completions-threshold 0
-      icomplete-compute-delay 0
-      icomplete-show-matches-on-no-input t
-      icomplete-scroll t
-      icomplete-hide-common-prefix nil
-      icomplete-prospects-height 20)
+;; -- Vertico (GNU ELPA, minibuffer vertical completion) -------------
+;; Replaces icomplete-vertical.  consult uses vertico's UI for preview.
+(vertico-mode 1)
+(setq vertico-resize nil
+      vertico-cycle t)
 
-(setq completion-styles '(flex basic))
+;; -- Orderless (GNU ELPA, flexible matching) -------------------------
+;; Replaces (flex basic).  Space = and, multiple words match in any order.
+(setq completion-styles '(orderless basic)
+      completion-category-defaults nil
+      completion-category-overrides '((file (styles partial-completion))))
 
-(with-eval-after-load 'icomplete
-  (define-key icomplete-minibuffer-map (kbd "C-n") #'icomplete-forward-completions)
-  (define-key icomplete-minibuffer-map (kbd "C-p") #'icomplete-backward-completions)
-  (define-key icomplete-minibuffer-map (kbd "<down>") #'icomplete-forward-completions)
-  (define-key icomplete-minibuffer-map (kbd "<up>") #'icomplete-backward-completions)
-  (define-key icomplete-minibuffer-map (kbd "C-j") #'icomplete-force-complete-and-exit))
+;; -- Consult (GNU ELPA) -- settings applied in init.el ---------------
 
 ;; -- Company mode (autocomplete popup, vendored) ---------------------
 (add-to-list 'load-path my/lisp-dir)
@@ -50,9 +46,8 @@
     (grep (format "rg -nH --no-heading --color=never --smart-case %s ."
                   (shell-quote-argument regexp)))))
 
-;; -- Consult (GNU ELPA) -- settings applied in init.el ---------------
-
 ;; -- Keybindings -----------------------------------------------------
+(global-set-key (kbd "C-x l")   #'mode-line-other-buffer)
 (global-set-key (kbd "C-x C-r") #'recentf-open-files)
 (global-set-key (kbd "M-g g")   #'consult-goto-line)
 (global-set-key (kbd "M-g M-g") #'consult-goto-line)

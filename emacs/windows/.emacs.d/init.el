@@ -29,8 +29,9 @@
 (package-initialize)
 (unless package-archive-contents
   (package-refresh-contents))
-(unless (package-installed-p 'consult)
-  (package-install 'consult))
+(dolist (p '(consult vertico orderless))
+  (unless (package-installed-p p)
+    (package-install p)))
 
 ;; ── Load Modules ───────────────────────────────────────────────────
 (defvar my/lisp-dir (expand-file-name "lisp" user-emacs-directory))
@@ -43,6 +44,9 @@
 (setq consult-ripgrep-args
       "rg --null --color=never --no-heading --line-number --smart-case --max-columns=1000")
 (add-hook 'completion-list-mode-hook #'consult-preview-at-point-mode)
+
+(require 'vertico)
+(require 'orderless)
 
 (my/load "editor")
 (my/load "ace-window")
