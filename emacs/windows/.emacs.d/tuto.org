@@ -58,10 +58,9 @@ Aguarde 0.8s apos =M-SPC= para ver o which-key com todas as opcoes.
 
 | Atalho                | Acao                                                             |
 |-----------------------+------------------------------------------------------------------|
-| =M-SPC TAB=           | Open workspace (dired left + code center + opencode right + eshell bottom) |
+| =M-SPC TAB=           | Open workspace (dired + code + eshell)                            |
 | =M-SPC d=             | Dired (explorador de arquivos)                                   |
 | =M-SPC '= / =M-SPC e= | Toggle eshell (terminal embutido)                                |
-| =M-SPC o=             | OpenCode (assistente de IA)                                      |
 
 ** Edicao
 
@@ -144,10 +143,10 @@ Aguarde 0.8s apos =M-SPC= para ver o which-key com todas as opcoes.
 
 -----
 
-* 5. Completions (Icomplete vertical, built-in)
+* 5. Completions
 
-No minibuffer, digite palavras-chave separadas por espaco com =completion-styles= = =flex=.
-
+- =company-mode= — autocomplete inline com popup via =company-capf= + =company-dabbrev=
+- =icomplete-vertical-mode= — completions no minibuffer com =flex= matching
 - =C-n= / =C-p= — navegar entre opcoes
 - =C-j= — confirmar selecao e sair
 - =RET= — confirmar input
@@ -185,12 +184,7 @@ Destaca TODO, FIXME, HACK, NOTE, XXX, BUG em comentarios. Ativo em =prog-mode= e
 =M-x my/treesit-install-grammars= instala todas as gramaticas configuradas.
 
 ** Eshell
-=M-SPC e= abre/fecha terminal. Prompt customizado, history persistente, comandos visuais configurados.
-
-** OpenCode
-- =M-x opencode= — inicia uma sessao no diretorio do projeto atual.
-- =M-x opencode-ask= — cria sessao e envia prompt direto.
-- =M-x opencode-ask-contextual= — envia prompt com contexto do buffer.
+=M-SPC e= abre/fecha terminal. Prompt colorido, history persistente, comandos visuais configurados.
 
 -----
 
@@ -201,16 +195,14 @@ Destaca TODO, FIXME, HACK, NOTE, XXX, BUG em comentarios. Ativo em =prog-mode= e
 | =init.el=                 | Carregador principal, performance, encoding                       |
 | =lisp/editor.el=          | Comportamento basico: eletric-pair, savehist, recentf, abbrev     |
 | =lisp/ui.el=              | Tema Modus Vivendi, dired, mode-line, VC gutter                   |
-| =lisp/completion.el=      | Icomplete vertical, project.el, ripgrep, which-key                |
+| =lisp/completion.el=      | Company-mode, Icomplete vertical, project.el, ripgrep, which-key  |
 | =lisp/windows.el=         | Display buffer rules, buffer-move, workspace                      |
 | =lisp/leader.el=          | Leader key =M-SPC=                                                |
 | =lisp/ace-window.el=      | Salto rapido entre janelas (implementacao propria)                |
 | =lisp/hl-todo.el=         | Highlight TODO/FIXME (implementacao propria)                      |
 | =lisp/vc-gutter.el=       | Indicadores git diff no fringe (implementacao propria)            |
 | =lisp/treesitter.el=      | Tree-sitter grammars e modos                                      |
-| =lisp/request-shim.el=    | Shim do request.el (built-in) para o emacs-opencode               |
 | =lisp/tools/git.el=       | VC: log toggle, blame, stash, push, pull                          |
-| =lisp/tools/ai.el=        | OpenCode: integracao com emacs-opencode                           |
 | =lisp/tools/eshell.el=    | Eshell customizado                                                |
 | =lisp/langs/go.el=        | Go: tree-sitter                                                   |
 | =lisp/langs/ts.el=        | TypeScript: tree-sitter, web-mode fallback                        |
