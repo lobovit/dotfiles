@@ -9,7 +9,12 @@
 (define-key my/leader-map (kbd "f f")   #'find-file)
 (define-key my/leader-map (kbd "f r")   #'recentf-open-files)
 (define-key my/leader-map (kbd "b b")   #'consult-buffer)
+(define-key my/leader-map (kbd "b s")   #'consult-buffer)  ; switch
+(define-key my/leader-map (kbd "b .")   #'consult-buffer)  ; mais rapido
 (define-key my/leader-map (kbd "b k")   #'kill-current-buffer)
+(define-key my/leader-map (kbd "b r")   #'consult-buffer-other-window)
+(define-key my/leader-map (kbd "b p")   #'previous-buffer)
+(define-key my/leader-map (kbd "b n")   #'next-buffer)
 
 ;; ── Busca ──────────────────────────────────────────────────────────
 (define-key my/leader-map (kbd "/")     #'consult-ripgrep)

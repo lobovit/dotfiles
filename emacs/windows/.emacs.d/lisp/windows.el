@@ -1,19 +1,15 @@
 ;;; windows.el --- Gerenciamento de janelas e workspaces -*- lexical-binding: t; -*-
 
 (defun my/open-workspace ()
-  "Open my default workspace layout: dired left, code center, opencode right, eshell bottom."
+  "Open my default workspace layout: dired left, code center, eshell bottom."
   (interactive)
   (delete-other-windows)
   (dired default-directory)
+  (split-window-right)
   (other-window 1)
-  (let ((main-win (selected-window)))
-    (split-window-below)
-    (other-window 1)
-    (eshell)
-    (select-window main-win)
-    (split-window-right)
-    (other-window 1)
-    (my/opencode)))
+  (split-window-below)
+  (other-window 1)
+  (eshell))
 
 ;; ── Tab bar (built-in) ─────────────────────────────────────────────
 (setq tab-bar-show 1
