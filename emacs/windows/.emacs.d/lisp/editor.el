@@ -36,7 +36,9 @@ buffers (including emacs-lisp-mode), evals the top-level form."
          (org-in-src-block-p))
     (org-babel-execute-src-block))
    ((derived-mode-p 'prog-mode)
-    (eval-defun nil))
+    (condition-case nil
+        (eval-defun nil)
+      (end-of-file (user-error "No expression to evaluate at point"))))
    (t
     (user-error "No eval context here (use in elisp or Org src block)"))))
 
