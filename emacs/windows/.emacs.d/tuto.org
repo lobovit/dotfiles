@@ -58,10 +58,18 @@ Aguarde 0.8s apos =M-SPC= para ver o which-key com todas as opcoes.
 
 | Atalho                | Acao                                                             |
 |-----------------------+------------------------------------------------------------------|
-| =M-SPC TAB=           | Open workspace (dired left + code center + opencode right + eshell bottom) |
-| =M-SPC d=             | Dired (explorador de arquivos)                                   |
-| =M-SPC '= / =M-SPC e= | Toggle eshell (terminal embutido)                                |
-| =M-SPC o=             | OpenCode (assistente de IA)                                      |
+| =M-SPC TAB=           | Open workspace (dired left + code center + eshell bottom) |
+| =M-SPC d=             | Dired (explorador de arquivos)                            |
+| =M-SPC '= / =M-SPC e= | Toggle eshell (terminal embutido)                         |
+
+** OpenCode (IA)
+
+| Atalho       | Acao                                        |
+|--------------+---------------------------------------------|
+| =M-SPC a s=  | Nova sessao no diretorio do projeto          |
+| =M-SPC a a=  | Prompt rapido (one-shot)                     |
+| =M-SPC a c=  | Prompt com contexto do buffer atual          |
+| =M-SPC a o=  | Abrir sessao existente                       |
 
 ** Edicao
 
@@ -188,9 +196,22 @@ Destaca TODO, FIXME, HACK, NOTE, XXX, BUG em comentarios. Ativo em =prog-mode= e
 =M-SPC e= abre/fecha terminal. Prompt customizado, history persistente, comandos visuais configurados.
 
 ** OpenCode
-- =M-x opencode= — inicia uma sessao no diretorio do projeto atual.
-- =M-x opencode-ask= — cria sessao e envia prompt direto.
-- =M-x opencode-ask-contextual= — envia prompt com contexto do buffer.
+- =M-SPC a s= — nova sessao (ou =M-x opencode=)
+- =M-SPC a a= — prompt rapido (ou =M-x opencode-ask=)
+- =M-SPC a c= — prompt com contexto do buffer (=M-x opencode-ask-contextual=)
+- =M-SPC a o= — abrir sessao salva (=M-x opencode-open-session=)
+
+Na sessao, teclas do buffer:
+- =C-c C-c= — enviar prompt
+- =C-c C-k= — interromper resposta
+- =C-c C-a= — selecionar agente
+- =C-c C-n= / =C-c C-p= — proximo/anterior agente
+- =C-c C-l= — selecionar modelo/provedor
+- =C-c C-o= — comando slash
+- =C-<tab>= — completar comando slash
+
+Config do Emacs: toda sessao carrega =~/.config/opencode/opencode.emacs.jsonc=
+com instrucoes que dizem ao agente que ele esta rodando dentro do Emacs.
 
 -----
 
@@ -208,10 +229,9 @@ Destaca TODO, FIXME, HACK, NOTE, XXX, BUG em comentarios. Ativo em =prog-mode= e
 | =lisp/hl-todo.el=         | Highlight TODO/FIXME (implementacao propria)                      |
 | =lisp/vc-gutter.el=       | Indicadores git diff no fringe (implementacao propria)            |
 | =lisp/treesitter.el=      | Tree-sitter grammars e modos                                      |
-| =lisp/request-shim.el=    | Shim do request.el (built-in) para o emacs-opencode               |
 | =lisp/tools/git.el=       | VC: log toggle, blame, stash, push, pull                          |
-| =lisp/tools/ai.el=        | OpenCode: integracao com emacs-opencode                           |
 | =lisp/tools/eshell.el=    | Eshell customizado                                                |
+| =lisp/opencode/=           | Cliente emacs-opencode (jdormit/emacs-opencode)                   |
 | =lisp/langs/go.el=        | Go: tree-sitter                                                   |
 | =lisp/langs/ts.el=        | TypeScript: tree-sitter, web-mode fallback                        |
 | =lisp/langs/csharp.el=    | C#: tree-sitter                                                   |
