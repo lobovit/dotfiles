@@ -25,6 +25,23 @@
 
 (add-hook 'before-save-hook #'delete-trailing-whitespace)
 
+;; ── Eval ────────────────────────────────────────────────────────────
+(defun my/eval-dwim ()
+  "Evaluate the defun or source block at point, depending on mode.
+In Org mode, evals the source block at point.  In prog-mode derived
+buffers (including emacs-lisp-mode), evals the top-level form."
+  (interactive)
+  (cond
+   ((and (derived-mode-p 'org-mode)
+         (org-in-src-block-p))
+    (org-babel-execute-src-block))
+   ((derived-mode-p 'prog-mode)
+    (eval-defun nil))
+   (t
+    (user-error "No eval context here (use in elisp or Org src block)"))))
+
+(global-set-key (kbd "<f5>") #'my/eval-dwim)
+
 ;; ── Goto last change (usando marker ring) ──────────────────────────
 (defun my/goto-last-change ()
   "Go to the last buffer change position using the mark ring."
