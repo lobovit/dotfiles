@@ -30,7 +30,7 @@
 (package-initialize)
 (unless package-archive-contents
   (package-refresh-contents))
-(dolist (p '(consult vertico orderless request))
+(dolist (p '(consult vertico orderless request org-modern))
   (unless (package-installed-p p)
     (package-install p)))
 
@@ -67,6 +67,7 @@
 (my/load "langs/csharp")
 (my/load "langs/markdown")
 (my/load "langs/docker")
+(my/load "langs/org")
 (my/load "tools/git")
 (my/load "tools/eshell")
 
