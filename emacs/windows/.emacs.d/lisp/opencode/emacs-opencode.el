@@ -289,14 +289,14 @@ once the server is ready."
         connection
         'POST
         "/session"
-        :data `(("directory" . ,normalized))
+        :json `((directory . ,normalized))
         :success (lambda (&rest args)
                    (let* ((data (plist-get args :data))
                           (session (opencode--session-from-data data)))
                      (opencode-session-open session connection)))
         :error (lambda (&rest _args)
                  (error "Failed to create OpenCode session")))))))
-
+ 
 ;;;###autoload
 (defun opencode-ask (directory prompt)
   "Create a new session for DIRECTORY and send PROMPT."
@@ -312,7 +312,7 @@ once the server is ready."
         connection
         'POST
         "/session"
-        :data `(("directory" . ,normalized))
+        :json `((directory . ,normalized))
         :success (lambda (&rest args)
                    (let* ((data (plist-get args :data))
                           (session (opencode--session-from-data data)))
