@@ -17,8 +17,8 @@
 ;; -- Company mode (autocomplete popup, vendored) ---------------------
 (add-to-list 'load-path my/lisp-dir)
 (load (expand-file-name "company" my/lisp-dir) nil 'nomessage)
-(setq company-idle-delay 0.2
-      company-minimum-prefix-length 1
+(setq company-idle-delay 0.5
+      company-minimum-prefix-length 2
       company-show-quick-access t
       company-tooltip-align-annotations t
       company-require-match nil
