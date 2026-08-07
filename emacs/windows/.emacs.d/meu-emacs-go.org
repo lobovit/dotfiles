@@ -1,0 +1,258 @@
+#+TITLE: Emacs para Golang — Guia do Dogão (edição 2026)
+#+AUTHOR: Lobo
+#+LANGUAGE: pt-BR
+
+* Pra quem é isto?
+
+Dogão, este guia é pra você que programa em Go e quer usar Emacs sem depender de MELPA, ELPA, nem pacote externo nenhum. Tudo que está aqui usa /exclusivamente/ o que já vem dentro do Emacs 29+. Go 1.26.2, Emacs 30 que funciona no Windows, Linux e macOS.
+
+* Pré-requisitos (instalar fora do Emacs)
+
+  Antes de abrir o Emacs, você precisa de 3 coisas no sistema:
+
+  1. [[https://go.dev/dl/][Go]] instalado e no =PATH= (versão 1.21+ recomendada, 1.26.2 é o atual)
+  2. [[https://github.com/golang/tools/tree/master/gopls][gopls]] instalado e no =PATH=
+     #+begin_src shell
+     go install golang.org/x/tools/gopls@latest
+     #+end_src
+  3. Emacs 29 ou superior (30 recomendado, que já vem com =which-key=)
+
+* Como a configuração funciona
+
+  O coração da config é o arquivo =lisp/langs/go.el=. Ele faz 4 coisas:
+
+  **1. Tree-sitter (realce de sintaxe moderno)**
+
+  O Emacs 29+ tem suporte nativo a /tree-sitter/. Em vez do antigo
+  =go-mode= (que usa regex para colorir código), usamos =go-ts-mode= e
+  =go-mod-ts-mode=, que entendem a /árvore sintática/ do Go de verdade.
+
+  Para isso funcionar, é preciso baixar as gramáticas:
+  - =M-x my/treesit-install-grammars= (roda uma vez só, pós-instalação)
+
+  As gramáticas estão definidas em =lisp/treesitter.el=:
+  #+begin_src elisp
+  (go    . ("https://github.com/tree-sitter/tree-sitter-go"))
+  (gomod . ("https://github.com/camdencheek/tree-sitter-go-mod" ...))
+  #+end_src
+
+  Associação arquivo → modo:
+  - =.go= → =go-ts-mode=
+  - =go.mod= → =go-mod-ts-mode=
+
+  **2. Eglot + gopls (LSP — linguagem server)**
+
+  =eglot= é o cliente LSP built-in do Emacs. Ele conversa com o =gopls=
+  (o servidor oficial de linguagem do Go) e fornece:
+
+  | Funcionalidade         | Como acessar                               |
+  |------------------------|--------------------------------------------|
+  | Autocomplete           | Automático enquanto digita                 |
+  | Pular pra definição    | =M-.= (=xref-find-definitions=)             |
+  | Voltar                 | =M-,= (=xref-go-back=)                      |
+  | Renomear símbolo       | =M-x eglot-rename=                          |
+  | Mostrar referências    | =M-x eglot-find-references=                 |
+  | Corrigir erros (quick-fix) | =M-x eglot-code-actions= ou =C-c C-a=  |
+  | Formatar buffer        | =M-x eglot-format-buffer=                  |
+  | Info do símbolo (hover) | Passar o mouse ou =C-h .=                 |
+
+  A config do gopls ativa =staticcheck= (linter extra) e usa busca
+  case-sensitive:
+
+  #+begin_src elisp :tangle no
+  (setq-default eglot-workspace-configuration
+    '((:gopls .
+        ((staticcheck . t)
+         (matcher . "CaseSensitive")))))
+  #+end_src
+
+  O eglot inicia automaticamente ao abrir qualquer =.go= ou =go.mod=.
+
+  **3. Formatação e imports automáticos ao salvar**
+
+  No =before-save-hook=, antes de gravar o arquivo, o Emacs:
+  - Formata o buffer via gopls (=eglot-format-buffer=)
+  - Organiza os imports via gopls (=source.organizeImports=)
+
+  Resultado: =goimports= é redundante aqui. Todo =Ctrl+S= já sai
+  formatado e com imports limpos.
+
+  **4. Flymake (diagnósticos — erros e warnings)**
+
+  =flymake= é o sistema built-in de diagnósticos. Os erros/warnings que
+  o gopls reporta aparecem:
+  - Sublinhados no código
+  - Na margem esquerda (fringe)
+  - Listáveis com =C-c ! l= (=flymake-show-buffer-diagnostics=)
+
+  Navegação entre erros:
+  - =C-c ! n= → próximo erro
+  - =C-c ! p= → erro anterior
+
+* Atalhos de teclado (keybindings)
+
+  Todos os atalhos abaixo são /locais/ — só funcionam dentro de buffer
+  =.go= ou =go.mod=.
+
+  | Atalho      | Comando                     | O que faz                        |
+  |-------------|-----------------------------|----------------------------------|
+  | =C-c C-r=   | =go-run-current-file=       | =goimports -w && go run=         |
+  | =C-c C-b=   | =my-go-build=               | =go build ./...=                 |
+  | =C-c C-t=   | =my-go-test=                | =go test ./...=                  |
+  | =C-c ! n=   | =flymake-goto-next-error=   | Pular pro próximo erro           |
+  | =C-c ! p=   | =flymake-goto-prev-error=   | Pular pro erro anterior          |
+  | =C-c ! l=   | =flymake-show-buffer-diagnostics= | Listar todos os erros       |
+  | =Ctrl+S=    | salvar (dispara formatação) | Formata + organiza imports       |
+  | =M-.=       | =xref-find-definitions=     | Ir pra definição do símbolo      |
+  | =M-,=       | =xref-go-back=              | Voltar de onde pulou             |
+  | =M-SPC /  = | =my/ripgrep=                | Buscar texto no projeto (rg)     |
+  | =M-SPC p f= | =project-find-file=         | Buscar arquivo no projeto        |
+
+  O =go.mod= na raiz do projeto é reconhecido automaticamente como raiz
+  do projeto (=project.el= + =project-vc-extra-root-markers=).
+
+* Copiar a config para o seu Emacs
+
+  Se você (Dogão) quiser ter exatamente o mesmo setup, siga isto:
+
+  **Passo 1: Estrutura de diretórios**
+
+  Tudo vive dentro de =~/.emacs.d= (no Windows: =%APPDATA%\.emacs.d=):
+
+  #+begin_example
+  ~/.emacs.d/
+  ├── init.el                  ← entrypoint (carrega os módulos)
+  └── lisp/
+      ├── completion.el        ← project-vc-extra-root-markers com "go.mod"
+      ├── treesitter.el        ← gramáticas tree-sitter + my/treesit-install-grammars
+      └── langs/
+          └── go.el            ← toda config de Go (este arquivo!)
+  #+end_example
+
+  **Passo 2: =init.el= mínimo**
+
+  No seu =init.el=, você precisa de uma função helper para carregar
+  módulos e das chamadas na ordem certa:
+
+  #+begin_src elisp
+  ;; -*- lexical-binding: t; -*-
+
+  (defun my/load (module)
+    "Load MODULE from lisp/ directory."
+    (load (expand-file-name (concat "lisp/" module) user-emacs-directory)))
+
+  ;; Ordem importa: treesitter antes de langs/go
+  (my/load "treesitter")
+  (my/load "completion")
+  (my/load "langs/go")
+  #+end_src
+
+  Só isso já basta. O resto da sua config (ui, leader, etc.) é opcional.
+
+  **Passo 3: =lisp/treesitter.el= (essencial)**
+
+  Sem isto, =go-ts-mode= não tem gramática e não funciona:
+
+  #+begin_src elisp
+  ;; -*- lexical-binding: t; -*-
+
+  (setq treesit-language-source-alist
+        '((go . ("https://github.com/tree-sitter/tree-sitter-go"))
+          (gomod . ("https://github.com/camdencheek/tree-sitter-go-mod"
+                    "main" "grammar"))))
+
+  (setq major-mode-remap-alist
+        '((go-mode . go-ts-mode)
+          (go-mod-mode . go-mod-ts-mode)))
+
+  (defun my/treesit-install-grammars ()
+    "Download and compile all tree-sitter grammars."
+    (interactive)
+    (dolist (lang treesit-language-source-alist)
+      (unless (treesit-ready-p (car lang) t)
+        (treesit-install-language-grammar (car lang)))))
+
+  (provide 'treesitter)
+  #+end_src
+
+  Depois de carregar, rode =M-x my/treesit-install-grammars= uma vez.
+
+  **Passo 4: =lisp/completion.el= (mínimo pra projetos)**
+
+  Só precisa disto para o Emacs reconhecer =go.mod= como raiz de projeto:
+
+  #+begin_src elisp
+  ;; -*- lexical-binding: t; -*-
+
+  (setq project-vc-extra-root-markers '("go.mod" ".project"))
+
+  (provide 'completion)
+  #+end_src
+
+  **Passo 5: =lisp/langs/go.el= (a config completa)**
+
+  Copie o arquivo inteiro que está neste repositório. Ele é auto-contido
+  e não depende de mais nada além de =treesitter.el= ter carregado antes.
+
+  Se quiser um resumo /minimalista/ (sem os atalhos de build/run, só o
+  essencial: tree-sitter + eglot + formatação), use isto:
+
+  #+begin_src elisp
+  ;; -*- lexical-binding: t; -*-
+
+  (defun my/go-format-and-imports ()
+    "Format buffer and organize imports via eglot/gopls."
+    (when (eglot-managed-p)
+      (eglot-format-buffer)
+      (eglot-code-actions (point-min) (point-max)
+                          nil "source.organizeImports" nil)))
+
+  (defun my/go-mode-hook ()
+    (setq-local tab-width 4)
+    (add-hook 'before-save-hook #'my/go-format-and-imports -10 t))
+
+  (dolist (hook '(go-ts-mode-hook go-mod-ts-mode-hook))
+    (add-hook hook #'my/go-mode-hook))
+
+  (with-eval-after-load 'eglot
+    (add-to-list 'eglot-server-programs '(go-ts-mode . ("gopls")))
+    (add-to-list 'eglot-server-programs '(go-mod-ts-mode . ("gopls"))))
+
+  (setq-default eglot-workspace-configuration
+    '((:gopls .
+        ((staticcheck . t)
+         (matcher . "CaseSensitive")))))
+
+  (add-hook 'go-ts-mode-hook #'eglot-ensure)
+  (add-hook 'go-mod-ts-mode-hook #'eglot-ensure)
+
+  (provide 'go)
+  #+end_src
+
+* Resumo: por que isto é melhor que o artigo de 2024
+
+  O artigo do =s10a.net= (dez/2024) usa =go-mode= antigo, =godef= e
+  =goimports= standalone. Ele /deliberadamente/ evita tree-sitter e LSP.
+
+  Esta config é superior em todos os pontos:
+
+  | Aspecto           | Artigo (2024)         | Esta config (2026)                |
+  |-------------------+-----------------------+-----------------------------------|
+  | Syntax highlight  | =go-mode= (regex)     | =go-ts-mode= (tree-sitter)        |
+  | Jump to def       | =godef=               | gopls via eglot (=M-.=)           |
+  | Autocomplete      | nenhum                | gopls via eglot (built-in)        |
+  | Formatação        | =goimports= externo   | gopls no =before-save-hook=       |
+  | Diagnósticos      | nenhum                | gopls + flymake + staticcheck     |
+  | Renomear          | nenhum                | =eglot-rename=                     |
+  | Pacotes externos  | apheleia, yasnippet   | zero — 100% built-in              |
+
+* Dúvidas?
+
+  Dogão, se algo não funcionar:
+
+  1. Confirme que =gopls= está no =PATH=: abre um terminal e roda =gopls version=
+  2. Confirme que as gramáticas tree-sitter foram instaladas: =M-x my/treesit-install-grammars=
+  3. Dentro de um =.go=, verifique se o eglot conectou: =M-x eglot-stderr-buffer=
+  4. Se o realce de sintaxe sumiu, rode =M-x go-ts-mode= manualmente
+
+  Abraço e bons commits!
