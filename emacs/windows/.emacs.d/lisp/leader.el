@@ -70,12 +70,6 @@
 ;; ── Bookmarks ─────────────────────────────────────────────────────
 (define-key my/leader-map (kbd "n")     #'consult-bookmark)
 
-;; ── OpenCode ───────────────────────────────────────────────────────
-(define-key my/leader-map (kbd "a s")   #'opencode)
-(define-key my/leader-map (kbd "a a")   #'opencode-ask)
-(define-key my/leader-map (kbd "a c")   #'opencode-ask-contextual)
-(define-key my/leader-map (kbd "a o")   #'opencode-open-session)
-
 ;; ── Help ───────────────────────────────────────────────────────────
 (define-key my/leader-map (kbd "h f")   #'describe-function)
 (define-key my/leader-map (kbd "h v")   #'describe-variable)

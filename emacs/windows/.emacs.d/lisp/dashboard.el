@@ -88,13 +88,12 @@ Each item is (label command desc)."
          '(("VC Dir"          vc-dir            "Git status (M-SPC g g)")
            ("VC Log"          vc-print-root-log "Git log (M-SPC g l)")))
         (my/dashboard--insert-section
-         "OpenCode"
-         '(("OpenCode"        opencode          "Start OpenCode (M-SPC a s)")
-           ("Ask"             opencode-ask      "Ask OpenCode (M-SPC a a)")))
+         "Terminal"
+         '(("Ghostel"         ghostel           "Open terminal (M-SPC T)")
+           ("Eshell"          eshell            "Terminal (M-SPC ')")))
         (my/dashboard--insert-section
          "Emacs"
-         '(("View bookmarks"   consult-bookmark "Bookmarks (M-SPC n)")
-           ("Eshell"           eshell           "Terminal (M-SPC ')")))
+         '(("View bookmarks"   consult-bookmark "Bookmarks (M-SPC n)")))
         (insert "\n  ")
         (let ((ver (emacs-version)))
           (insert (propertize (concat "Emacs " (substring ver 0 (string-match " of " ver)))

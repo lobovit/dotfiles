@@ -195,23 +195,10 @@ Destaca TODO, FIXME, HACK, NOTE, XXX, BUG em comentarios. Ativo em =prog-mode= e
 ** Eshell
 =M-SPC e= abre/fecha terminal. Prompt customizado, history persistente, comandos visuais configurados.
 
-** OpenCode
-- =M-SPC a s= — nova sessao (ou =M-x opencode=)
-- =M-SPC a a= — prompt rapido (ou =M-x opencode-ask=)
-- =M-SPC a c= — prompt com contexto do buffer (=M-x opencode-ask-contextual=)
-- =M-SPC a o= — abrir sessao salva (=M-x opencode-open-session=)
-
-Na sessao, teclas do buffer:
-- =C-c C-c= — enviar prompt
-- =C-c C-k= — interromper resposta
-- =C-c C-a= — selecionar agente
-- =C-c C-n= / =C-c C-p= — proximo/anterior agente
-- =C-c C-l= — selecionar modelo/provedor
-- =C-c C-o= — comando slash
-- =C-<tab>= — completar comando slash
-
-Config do Emacs: toda sessao carrega =~/.config/opencode/opencode.emacs.jsonc=
-com instrucoes que dizem ao agente que ele esta rodando dentro do Emacs.
+** Ghostel
+=M-SPC T= abre um terminal completo (PowerShell) via ghostel. Dentro dele,
+rode =opencode= (TUI) diretamente. A config do OpenCode fica em
+=~/.config/opencode/opencode.jsonc=.
 
 -----
 
@@ -231,7 +218,8 @@ com instrucoes que dizem ao agente que ele esta rodando dentro do Emacs.
 | =lisp/treesitter.el=      | Tree-sitter grammars e modos                                      |
 | =lisp/tools/git.el=       | VC: log toggle, blame, stash, push, pull                          |
 | =lisp/tools/eshell.el=    | Eshell customizado                                                |
-| =lisp/opencode/=           | Cliente emacs-opencode (jdormit/emacs-opencode)                   |
+| =lisp/tools/ghostel.el=   | Terminal (ghostel) configurado                                    |
+| =lisp/dashboard.el=       | Tela inicial customizada (logo + atalhos)                        |
 | =lisp/langs/go.el=        | Go: tree-sitter                                                   |
 | =lisp/langs/ts.el=        | TypeScript: tree-sitter, web-mode fallback                        |
 | =lisp/langs/csharp.el=    | C#: tree-sitter                                                   |

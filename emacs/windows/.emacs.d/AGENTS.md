@@ -1,7 +1,7 @@
 # AGENTS.md
 
 Emacs configuration — mostly built-in code with GNU ELPA + MELPA packages
-(`consult`, `vertico`, `orderless`, `request`, `org-modern`) and vendored
+(`consult`, `vertico`, `orderless`, `org-modern`) and vendored
 `company-mode` in `lisp/`. See `init.el` for the load order.
 
 ## Structure
@@ -13,11 +13,10 @@ Emacs configuration — mostly built-in code with GNU ELPA + MELPA packages
   - `tools/` — git, eshell, ghostel
   - `ace-window.el`, `hl-todo.el`, `vc-gutter.el`, `dashboard.el` — custom implementations replacing popular packages
   - `company.el`, `company-capf.el`, `company-dabbrev.el`, `company-dabbrev-code.el` — vendored company-mode
-  - `opencode/` — subproject: Emacs client for OpenCode (see `lisp/opencode/AGENTS.md`)
 
 ## Key Conventions
 
-- **Requires**: built-ins first (`cl-lib`, `subr-x`, `project`, `treesit`, `eglot`, `url`, `vc`), then project modules, then external packages (GNU ELPA: `consult`, `vertico`, `orderless`; MELPA: `request`, `org-modern`).
+- **Requires**: built-ins first (`cl-lib`, `subr-x`, `project`, `treesit`, `eglot`, `url`, `vc`), then project modules, then external packages (GNU ELPA: `consult`, `vertico`, `orderless`; MELPA: `org-modern`, `ghostel`).
 - `;; -*- lexical-binding: t; -*-` in every `.el` file.
 - Standard file header, `(provide '...)`, and `;;; <file>.el ends here` trailer.
 - 2-space indentation (Emacs Lisp default). Lines wrap around 80–100 cols.
@@ -31,7 +30,6 @@ Emacs configuration — mostly built-in code with GNU ELPA + MELPA packages
 | `vertico`   | GNU ELPA | Minibuffer vertical completion UI |
 | `orderless` | GNU ELPA | Flexible space-separated matching |
 | `consult`   | GNU ELPA | Enhanced commands (buffer, ripgrep, line, imenu, goto-line, bookmark) |
-| `request`   | MELPA    | HTTP client library (required by `emacs-opencode`) |
 | `org-modern`| MELPA    | Modern styling for Org mode buffers |
 | `ghostel`   | MELPA    | Native terminal emulator (libghostty-vt); auto-downloads `ghostel-module.dll` on first use |
 
@@ -81,23 +79,10 @@ Leader is `M-SPC` (defined in `lisp/leader.el`):
 - `m m/e/x` kmacro start/end/call
 - `n` consult-bookmark
 - `h f/v/k/d` describe-function/variable/key/local-help
-- `a s` opencode, `a a` opencode-ask, `a c` opencode-ask-contextual, `a o` opencode-open-session
 
-## OpenCode Subproject (`lisp/opencode/`)
+## OpenCode Usage
 
-The `emacs-opencode` client lives as a subproject with its own AGENTS.md, tests,
-and conventions. The parent `init.el` installs its dependency (`request` from
-MELPA) and loads it via:
-
-```elisp
-(add-to-list 'load-path (expand-file-name "lisp/opencode" user-emacs-directory))
-(require 'emacs-opencode)
-```
-
-- **`request`** is installed by the parent `init.el` via `package.el` into
-  `~/.emacs.d/elpa/request-<version>/`.
-- Tests use ERT. See `lisp/opencode/AGENTS.md` for test commands and code
-  style specific to that subproject.
-- The opencode server uses a separate config file:
-  `~/.config/opencode/opencode.emacs.jsonc` (set via `opencode-server-environment`
-  in `init.el`).
+OpenCode is not integrated as an Emacs package. It is invoked directly from
+the terminal running inside Ghostel (`M-SPC T`, or `M-x ghostel`): run the
+`opencode` TUI there. The opencode config lives at
+`~/.config/opencode/opencode.jsonc`.

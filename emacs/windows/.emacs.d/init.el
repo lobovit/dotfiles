@@ -22,7 +22,7 @@
 (set-file-name-coding-system 'utf-8-unix)
 (modify-coding-system-alist 'process "*" 'utf-8)
 
-;; ── Package system (GNU ELPA + MELPA for opencode deps) ────────────
+;; ── Package system (GNU ELPA + MELPA) ─────────────────────────────
 (require 'package)
 (add-to-list 'package-archives '("gnu" . "https://elpa.gnu.org/packages/"))
 (add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/"))
@@ -30,7 +30,7 @@
 (package-initialize)
 (unless package-archive-contents
   (package-refresh-contents))
-(dolist (p '(consult vertico orderless request org-modern ghostel))
+(dolist (p '(consult vertico orderless org-modern ghostel))
   (unless (package-installed-p p)
     (package-install p)))
 
@@ -48,12 +48,6 @@
 
 (require 'vertico)
 (require 'orderless)
-
-;; ── OpenCode (Emacs client) ────────────────────────────────────────
-(add-to-list 'load-path (expand-file-name "lisp/opencode" user-emacs-directory))
-(require 'emacs-opencode)
-(setq opencode-server-environment
-      `(("OPENCODE_CONFIG" . ,(expand-file-name "~/.config/opencode/opencode.emacs.jsonc"))))
 
 (my/load "editor")
 (my/load "ace-window")
