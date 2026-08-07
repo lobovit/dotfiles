@@ -1,35 +1,39 @@
 # AGENTS.md
 
-Emacs configuration — mostly built-in code with a few GNU ELPA packages
-(`consult`, `vertico`, `orderless`) and vendored `company-mode` in `lisp/`.
-See `init.el` for the load order.
+Emacs configuration — mostly built-in code with GNU ELPA + MELPA packages
+(`consult`, `vertico`, `orderless`, `request`, `org-modern`) and vendored
+`company-mode` in `lisp/`. See `init.el` for the load order.
 
 ## Structure
 
 - `init.el` — entrypoint; installs GNU ELPA packages, then loads modules via `(my/load "...")` from `lisp/`
 - `lisp/` — all configuration, grouped by concern:
-  - `editor.el`, `ui.el`, `completion.el`, `windows.el`, `leader.el`, `treesitter.el`
-  - `langs/` — per-language config (go, ts, csharp, markdown, docker)
-  - `tools/` — git, eshell
-  - `ace-window.el`, `hl-todo.el`, `vc-gutter.el` — custom implementations replacing popular packages
+  - `editor.el`, `ui.el`, `completion.el`, `windows.el`, `leader.el`, `treesitter.el`, `dashboard.el`
+  - `langs/` — per-language config (go, ts, csharp, markdown, docker, org)
+  - `tools/` — git, eshell, ghostel
+  - `ace-window.el`, `hl-todo.el`, `vc-gutter.el`, `dashboard.el` — custom implementations replacing popular packages
   - `company.el`, `company-capf.el`, `company-dabbrev.el`, `company-dabbrev-code.el` — vendored company-mode
+  - `opencode/` — subproject: Emacs client for OpenCode (see `lisp/opencode/AGENTS.md`)
 
 ## Key Conventions
 
-- **Requires**: built-ins first (`cl-lib`, `subr-x`, `project`, `treesit`, `eglot`, `url`, `vc`), then project modules. No MELPA packages; only GNU ELPA (`consult`, `vertico`, `orderless`).
+- **Requires**: built-ins first (`cl-lib`, `subr-x`, `project`, `treesit`, `eglot`, `url`, `vc`), then project modules, then external packages (GNU ELPA: `consult`, `vertico`, `orderless`; MELPA: `request`, `org-modern`).
 - `;; -*- lexical-binding: t; -*-` in every `.el` file.
 - Standard file header, `(provide '...)`, and `;;; <file>.el ends here` trailer.
 - 2-space indentation (Emacs Lisp default). Lines wrap around 80–100 cols.
 - Private helpers prefix with `my/` (e.g., `my/load`, `my/ace-window`). Minor mode and public-facing symbols use descriptive names like `vc-gutter-mode`.
 - Docstrings for all public-facing defuns, defcustoms, defvars. First sentence ends with period. Args in ALL CAPS.
 
-## External Packages (GNU ELPA only)
+## External Packages
 
-| Package     | Purpose |
-|---|---|
-| `vertico`   | Minibuffer vertical completion UI |
-| `orderless` | Flexible space-separated matching |
-| `consult`   | Enhanced commands (buffer, ripgrep, line, imenu, goto-line, bookmark) |
+| Package     | Source   | Purpose |
+|---|---|---|---|
+| `vertico`   | GNU ELPA | Minibuffer vertical completion UI |
+| `orderless` | GNU ELPA | Flexible space-separated matching |
+| `consult`   | GNU ELPA | Enhanced commands (buffer, ripgrep, line, imenu, goto-line, bookmark) |
+| `request`   | MELPA    | HTTP client library (required by `emacs-opencode`) |
+| `org-modern`| MELPA    | Modern styling for Org mode buffers |
+| `ghostel`   | MELPA    | Native terminal emulator (libghostty-vt); auto-downloads `ghostel-module.dll` on first use |
 
 ## Custom Implementations (replacing popular packages)
 
@@ -44,6 +48,7 @@ See `init.el` for the load order.
 | `diff-hl`         | `lisp/vc-gutter.el` — fringe overlay |
 | `projectile`      | Built-in `project.el` with `vc` backend + extra root markers (`go.mod`, `.project`) |
 | `hl-todo`         | `lisp/hl-todo.el` — font-lock keywords |
+| `dashboard`       | `lisp/dashboard.el` — custom startup buffer (logo + shortcuts); `initial-buffer-choice` is set to it |
 
 ## Testing / Verification
 
@@ -70,9 +75,29 @@ Leader is `M-SPC` (defined in `lisp/leader.el`):
 - `g g` vc-dir, `g l` vc-log-toggle, `g b` vc-blame, `g s` / `g S` stash/pop, `g ,` / `g .` goto-last-change
 - `p p` project-switch-project, `p f` project-find-file
 - `<tab>` workspace layout (dired + code + eshell)
-- `d` dired, `'` / `e` eshell-toggle, `E` eval-buffer
+- `d` dired, `'` / `e` eshell-toggle, `E` eval-buffer, `T` ghostel
 - `t d` dired-sidebar toggle, `t l` / `t n` line-numbers toggle
 - `j` ace-window, `l` consult-goto-line
 - `m m/e/x` kmacro start/end/call
 - `n` consult-bookmark
 - `h f/v/k/d` describe-function/variable/key/local-help
+- `a s` opencode, `a a` opencode-ask, `a c` opencode-ask-contextual, `a o` opencode-open-session
+
+## OpenCode Subproject (`lisp/opencode/`)
+
+The `emacs-opencode` client lives as a subproject with its own AGENTS.md, tests,
+and conventions. The parent `init.el` installs its dependency (`request` from
+MELPA) and loads it via:
+
+```elisp
+(add-to-list 'load-path (expand-file-name "lisp/opencode" user-emacs-directory))
+(require 'emacs-opencode)
+```
+
+- **`request`** is installed by the parent `init.el` via `package.el` into
+  `~/.emacs.d/elpa/request-<version>/`.
+- Tests use ERT. See `lisp/opencode/AGENTS.md` for test commands and code
+  style specific to that subproject.
+- The opencode server uses a separate config file:
+  `~/.config/opencode/opencode.emacs.jsonc` (set via `opencode-server-environment`
+  in `init.el`).

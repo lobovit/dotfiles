@@ -62,6 +62,27 @@
   (setf (alist-get ?X org-modern-checkbox)
         #("☑" 0 1 (composition ((1))))))
 
+;; ── LaTeX export ──────────────────────────────────────────────────────
+(when (eq system-type 'windows-nt)
+  (add-to-list 'exec-path
+               (expand-file-name "~\\AppData\\Local\\Programs\\MiKTeX\\miktex\\bin\\x64\\")))
+
+(with-eval-after-load 'ox-latex
+  (setq org-latex-pdf-process
+        '("pdflatex -interaction nonstopmode -output-directory %o %f"
+          "pdflatex -interaction nonstopmode -output-directory %o %f"
+          "pdflatex -interaction nonstopmode -output-directory %o %f"))
+  (add-to-list 'org-latex-classes
+               '("moderncv"
+                 "\\documentclass[11pt,a4paper,sans]{moderncv}
+\\moderncvstyle{casual}
+\\moderncvcolor{blue}
+\\usepackage[scale=0.75]{geometry}
+\\setlength{\\footskip}{60pt}"
+                 ("\\section{%s}" . "\\section*{%s}")
+                 ("\\subsection{%s}" . "\\subsection*{%s}")
+                 ("\\subsubsection{%s}" . "\\subsubsection*{%s}"))))
+
 ;; ── Misc ─────────────────────────────────────────────────────────────
 (add-hook 'org-mode-hook #'visual-line-mode)
 

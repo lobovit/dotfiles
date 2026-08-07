@@ -30,7 +30,7 @@
 (package-initialize)
 (unless package-archive-contents
   (package-refresh-contents))
-(dolist (p '(consult vertico orderless request org-modern))
+(dolist (p '(consult vertico orderless request org-modern ghostel))
   (unless (package-installed-p p)
     (package-install p)))
 
@@ -59,6 +59,8 @@
 (my/load "ace-window")
 (my/load "hl-todo")
 (my/load "ui")
+(my/load "dashboard")
+(setq initial-buffer-choice #'my/dashboard-refresh)
 (my/load "completion")
 (my/load "windows")
 (my/load "treesitter")
@@ -70,6 +72,7 @@
 (my/load "langs/org")
 (my/load "tools/git")
 (my/load "tools/eshell")
+(my/load "tools/ghostel")
 
 (my/load "leader")
 

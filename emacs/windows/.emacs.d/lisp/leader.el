@@ -51,6 +51,7 @@
 (define-key my/leader-map (kbd "'")     #'my/eshell-toggle)
 (define-key my/leader-map (kbd "e")     #'my/eshell-toggle)
 (define-key my/leader-map (kbd "E")     #'eval-buffer)
+(define-key my/leader-map (kbd "T")     #'ghostel)
 
 ;; ── Toggles ────────────────────────────────────────────────────────
 (define-key my/leader-map (kbd "t d")   #'my/dired-sidebar-toggle)
@@ -68,6 +69,12 @@
 
 ;; ── Bookmarks ─────────────────────────────────────────────────────
 (define-key my/leader-map (kbd "n")     #'consult-bookmark)
+
+;; ── OpenCode ───────────────────────────────────────────────────────
+(define-key my/leader-map (kbd "a s")   #'opencode)
+(define-key my/leader-map (kbd "a a")   #'opencode-ask)
+(define-key my/leader-map (kbd "a c")   #'opencode-ask-contextual)
+(define-key my/leader-map (kbd "a o")   #'opencode-open-session)
 
 ;; ── Help ───────────────────────────────────────────────────────────
 (define-key my/leader-map (kbd "h f")   #'describe-function)

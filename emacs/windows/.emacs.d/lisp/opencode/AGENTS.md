@@ -15,27 +15,28 @@ and consistent with existing code.
 There is no Makefile or CI. Use these commands manually:
 
 Because `emacs -Q` skips user configuration, external dependencies
-(currently just `request`, installed via `straight.el`) must be added to
-the load path explicitly.
+(currently just `request`, installed by the parent `init.el` via
+`package.el`) must be added to the load path explicitly. It lives in
+`~/.emacs.d/elpa/request-<version>/` (currently `request-0.3.3`).
 
 ```sh
 # Byte-compile all files (catches undefined variables, missing requires, etc.)
-emacs -Q -L . -L ~/.emacs.d/straight/build/request -batch -f batch-byte-compile *.el
+emacs -Q -L . -L ~/.emacs.d/elpa/request-0.3.3 -batch -f batch-byte-compile *.el
 
 # Byte-compile a single file
-emacs -Q -L . -L ~/.emacs.d/straight/build/request -batch -f batch-byte-compile emacs-opencode-client.el
+emacs -Q -L . -L ~/.emacs.d/elpa/request-0.3.3 -batch -f batch-byte-compile emacs-opencode-client.el
 
 # Run checkdoc on a single file (docstring style)
-emacs -Q -L . -L ~/.emacs.d/straight/build/request -batch --eval '(checkdoc-file "emacs-opencode-client.el")'
+emacs -Q -L . -L ~/.emacs.d/elpa/request-0.3.3 -batch --eval '(checkdoc-file "emacs-opencode-client.el")'
 
 # Run all ERT tests
-emacs -Q -L . -L ~/.emacs.d/straight/build/request -batch -L tests -l tests/run-tests.el -f ert-run-tests-batch-and-exit
+emacs -Q -L . -L ~/.emacs.d/elpa/request-0.3.3 -batch -L tests -l tests/run-tests.el -f ert-run-tests-batch-and-exit
 
 # Run a single test file
-emacs -Q -L . -L ~/.emacs.d/straight/build/request -batch -L tests -l tests/emacs-opencode-sse-test.el -f ert-run-tests-batch-and-exit
+emacs -Q -L . -L ~/.emacs.d/elpa/request-0.3.3 -batch -L tests -l tests/emacs-opencode-sse-test.el -f ert-run-tests-batch-and-exit
 
 # Run tests matching a pattern
-emacs -Q -L . -L ~/.emacs.d/straight/build/request -batch -L tests -l tests/run-tests.el --eval '(ert-run-tests-batch-and-exit "test-opencode-sse")'
+emacs -Q -L . -L ~/.emacs.d/elpa/request-0.3.3 -batch -L tests -l tests/run-tests.el --eval '(ert-run-tests-batch-and-exit "test-opencode-sse")'
 ```
 
 Tests live in `tests/` with one file per source module (e.g.,
@@ -161,7 +162,7 @@ variables module (`emacs-opencode-session-vars`) and `declare-function`.
 - Follow existing naming and registry patterns.
 - Keep errors user-friendly and fail fast on invalid state.
 - Prefer editing existing files over adding new modules.
-- Byte-compile to catch issues: `emacs -Q -L . -L ~/.emacs.d/straight/build/request -batch -f batch-byte-compile *.el`
+- Byte-compile to catch issues: `emacs -Q -L . -L ~/.emacs.d/elpa/request-0.3.3 -batch -f batch-byte-compile *.el`
 
 ## Notes for Agents
 
