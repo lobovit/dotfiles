@@ -13,11 +13,11 @@
         (css . ("https://github.com/tree-sitter/tree-sitter-css"))
         (html . ("https://github.com/tree-sitter/tree-sitter-html"))
         (json . ("https://github.com/tree-sitter/tree-sitter-json"))
-        (yaml . ("https://github.com/tree-sitter-grammars/tree-sitter-yaml"))
+        (yaml . ("https://github.com/ikatyang/tree-sitter-yaml" "v0.5.0"))
         (bash . ("https://github.com/tree-sitter/tree-sitter-bash"))
         (csharp . ("https://github.com/tree-sitter/tree-sitter-c-sharp"))
         (dockerfile . ("https://github.com/camdencheek/tree-sitter-dockerfile"))
-        (markdown . ("https://github.com/tree-sitter-grammars/tree-sitter-markdown"))))
+        (markdown . ("https://github.com/MDeiml/tree-sitter-markdown" "v0.3.0"))))
 
 ;; ── Tree-sitter lang list (lang . file patterns) ───────────────────
 (defvar my/treesit-langs
@@ -35,7 +35,7 @@
     (bash       ("\\.sh\\'" . bash-ts-mode)        ("\\.bash\\'" . bash-ts-mode))
     (csharp     ("\\.cs\\'" . csharp-ts-mode))
     (dockerfile ("Dockerfile\\'" . dockerfile-ts-mode) ("\\.dockerfile\\'" . dockerfile-ts-mode))
-    (markdown   ("\\.md\\'" . markdown-ts-mode)    ("\\.markdown\\'" . markdown-ts-mode))))
+    (markdown   nil)))
 
 (defun my/treesit-install-grammars ()
   "Install all configured tree-sitter grammars."

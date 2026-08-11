@@ -30,7 +30,7 @@
 (package-initialize)
 (unless package-archive-contents
   (package-refresh-contents))
-(dolist (p '(consult vertico orderless org-modern ghostel))
+(dolist (p '(consult vertico orderless org-modern ghostel markdown-mode))
   (unless (package-installed-p p)
     (package-install p)))
 
@@ -61,6 +61,8 @@
 (my/load "langs/go")
 (my/load "langs/c")
 (my/load "langs/ts")
+(my/load "langs/json")
+(my/load "langs/yaml")
 (my/load "langs/csharp")
 (my/load "langs/markdown")
 (my/load "langs/docker")

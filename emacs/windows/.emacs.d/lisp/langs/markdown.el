@@ -1,4 +1,4 @@
-;;; markdown.el --- Markdown com markdown-ts-mode (built-in) e mermaid -*- lexical-binding: t; -*-
+;;; markdown.el --- Markdown com markdown-mode (GNU ELPA) e mermaid -*- lexical-binding: t; -*-
 
 (defvar-local my/markdown-mermaid-overlays nil)
 
@@ -33,11 +33,10 @@
                   (push ov my/markdown-mermaid-overlays))))))))))
 
 ;; ── Bind mermaid render in markdown ─────────────────────────────────
-(with-eval-after-load 'markdown-ts-mode
-  (define-key markdown-ts-mode-map (kbd "C-c C-m") #'my/markdown-render-mermaid))
+(with-eval-after-load 'markdown-mode
+  (define-key markdown-mode-map (kbd "C-c C-m") #'my/markdown-render-mermaid))
 
 ;; ── Enable visual wrap for prose ───────────────────────────────────
-(add-hook 'markdown-ts-mode-hook #'visual-line-mode)
 (add-hook 'markdown-mode-hook #'visual-line-mode)
 
 (provide 'markdown)
