@@ -3,7 +3,9 @@
 (require 'treesit)
 
 (setq treesit-language-source-alist
-      '((go . ("https://github.com/tree-sitter/tree-sitter-go"))
+      '((c . ("https://github.com/tree-sitter/tree-sitter-c" "v0.23.6"))
+        (cpp . ("https://github.com/tree-sitter/tree-sitter-cpp" "v0.23.4"))
+        (go . ("https://github.com/tree-sitter/tree-sitter-go"))
         (gomod . ("https://github.com/camdencheek/tree-sitter-go-mod" "main" "grammar"))
         (typescript . ("https://github.com/tree-sitter/tree-sitter-typescript" "master" "typescript/src"))
         (tsx . ("https://github.com/tree-sitter/tree-sitter-typescript" "master" "tsx/src"))
@@ -19,7 +21,11 @@
 
 ;; ── Tree-sitter lang list (lang . file patterns) ───────────────────
 (defvar my/treesit-langs
-  '((go        ("\\.go\\'" . go-ts-mode)      ("go\\.mod\\'" . go-mod-ts-mode))
+  '((c         ("\\.c\\'" . c-ts-mode)       ("\\.h\\'" . c-ts-mode))
+    (cpp       ("\\.cc\\'" . c++-ts-mode)    ("\\.cpp\\'" . c++-ts-mode)
+               ("\\.cxx\\'" . c++-ts-mode)   ("\\.hpp\\'" . c++-ts-mode)
+               ("\\.hh\\'" . c++-ts-mode)    ("\\.hxx\\'" . c++-ts-mode))
+    (go        ("\\.go\\'" . go-ts-mode)      ("go\\.mod\\'" . go-mod-ts-mode))
     (typescript ("\\.ts\\'" . typescript-ts-mode)  ("\\.tsx\\'" . tsx-ts-mode))
     (javascript ("\\.js\\'" . js-ts-mode)          ("\\.cjs\\'" . js-ts-mode) ("\\.mjs\\'" . js-ts-mode))
     (css        ("\\.css\\'" . css-ts-mode))
