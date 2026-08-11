@@ -9,7 +9,7 @@ Emacs configuration — mostly built-in code with GNU ELPA + MELPA packages
 - `init.el` — entrypoint; installs GNU ELPA packages, then loads modules via `(my/load "...")` from `lisp/`
 - `lisp/` — all configuration, grouped by concern:
   - `editor.el`, `ui.el`, `completion.el`, `windows.el`, `leader.el`, `treesitter.el`, `dashboard.el`
-  - `langs/` — per-language config (go, ts, csharp, markdown, docker, org)
+  - `langs/` — per-language config (go, c, ts, csharp, markdown, docker, org)
   - `tools/` — git, eshell, ghostel
   - `ace-window.el`, `hl-todo.el`, `vc-gutter.el`, `dashboard.el` — custom implementations replacing popular packages
   - `company.el`, `company-capf.el`, `company-dabbrev.el`, `company-dabbrev-code.el` — vendored company-mode

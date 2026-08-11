@@ -59,6 +59,7 @@
 (my/load "windows")
 (my/load "treesitter")
 (my/load "langs/go")
+(my/load "langs/c")
 (my/load "langs/ts")
 (my/load "langs/csharp")
 (my/load "langs/markdown")
