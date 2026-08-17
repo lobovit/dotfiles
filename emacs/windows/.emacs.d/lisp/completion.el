@@ -17,7 +17,7 @@
 ;; -- Company mode (autocomplete popup, vendored) ---------------------
 (add-to-list 'load-path my/lisp-dir)
 (load (expand-file-name "company" my/lisp-dir) nil 'nomessage)
-(setq company-idle-delay 0.5
+(setq company-idle-delay nil
       company-minimum-prefix-length 2
       company-show-quick-access t
       company-tooltip-align-annotations t
@@ -25,9 +25,9 @@
       company-dabbrev-ignore-case 'keep-prefix
       company-dabbrev-downcase nil
       company-backends '((company-capf :separate)
-                         company-dabbrev-code
-                         company-dabbrev))
+                         company-dabbrev-code))
 (global-company-mode 1)
+(global-set-key (kbd "M-/") #'company-complete)
 
 ;; -- Which-key (built-in on Emacs 30+) -------------------------------
 (when (fboundp 'which-key-mode)
