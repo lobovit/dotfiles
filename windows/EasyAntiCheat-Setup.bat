@@ -2,12 +2,24 @@
 title EasyAntiCheat - Apex Legends
 color 0A
 
+REM Vai para a pasta do proprio script
+cd /d "%~dp0"
+
 echo ========================================
 echo   EASYANTICHEAT - APEX LEGENDS
 echo ========================================
 echo.
+echo Pasta: %cd%
 echo Product ID: 5dcd88f4e2094a698ebffa43438edc33
 echo.
+
+REM Verifica se o executavel existe
+if not exist "EasyAntiCheat_EOS_Setup.exe" (
+    echo ERRO: EasyAntiCheat_EOS_Setup.exe nao encontrado!
+    echo Pasta atual: %cd%
+    pause
+    exit /b 1
+)
 
 :MENU
 echo [1] Instalar EasyAntiCheat
