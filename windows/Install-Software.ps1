@@ -81,9 +81,9 @@ Write-Host "`n[3/3] Instalando programas..." -ForegroundColor Yellow
 & $chocoExe config set --name installLocation --value "D:\softwares" 2>$null
 
 $programs = @(
-    @{ Name = "GIMP"; Package = "gimp"; Version = "3.2.4" },
-    @{ Name = "Shotcut"; Package = "shotcut.install"; Version = "" },
-    @{ Name = "Blender"; Package = "blender"; Version = "" }
+    @{ Name = "GIMP"; Package = "gimp"; Version = "3.2.4"; InstallArgs = "" },
+    @{ Name = "Shotcut"; Package = "shotcut.install"; Version = ""; InstallArgs = "/DIR=D:\softwares\Shotcut" },
+    @{ Name = "Blender"; Package = "blender"; Version = ""; InstallArgs = "" }
 )
 
 foreach ($prog in $programs) {
@@ -93,12 +93,38 @@ foreach ($prog in $programs) {
     if ($prog.Version) {
         $installCmd += " --version=$($prog.Version)"
     }
+    if ($prog.InstallArgs) {
+        $installCmd += " --install-arguments='$($prog.InstallArgs)'"
+    }
     
     try {
         Invoke-Expression $installCmd
         Write-Host "  [$($prog.Name)] Instalado com sucesso!" -ForegroundColor Green
     } catch {
         Write-Host "  [$($prog.Name)] ERRO: $($_.Exception.Message)" -ForegroundColor Red
+    }
+}
+
+# Blender precisa de movimentacao manual (MSI nao suporta /DIR)
+$blenderSource = "C:\Program Files\Blender Foundation\Blender 5.2"
+$blenderDest = "D:\softwares\Blender"
+
+if (Test-Path $blenderSource) {
+    Write-Host "`n  Movendo Blender para D:\softwares..." -ForegroundColor Yellow
+    
+    if (-not (Test-Path "D:\softwares")) {
+        New-Item -ItemType Directory -Path "D:\softwares" -Force | Out-Null
+    }
+    
+    Copy-Item -Path $blenderSource -Destination $blenderDest -Recurse -Force
+    $sourceCount = (Get-ChildItem $blenderSource -Recurse -File).Count
+    $destCount = (Get-ChildItem $blenderDest -Recurse -File).Count
+    
+    if ($sourceCount -eq $destCount) {
+        Remove-Item -Path $blenderSource -Recurse -Force
+        Write-Host "  [Blender] Movido para D:\softwares\Blender" -ForegroundColor Green
+    } else {
+        Write-Host "  [Blender] ERRO: Falha na copia" -ForegroundColor Red
     }
 }
 
