@@ -49,6 +49,9 @@
   (unless (package-installed-p p)
     (package-install p)))
 
+;; Um caractere por tecla (default insere 3–6).
+(setq hacker-typer-type-rate 1)
+
 ;; ── Load Modules ───────────────────────────────────────────────────
 (defvar my/lisp-dir (expand-file-name "lisp" user-emacs-directory))
 
