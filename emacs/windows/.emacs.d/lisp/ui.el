@@ -7,6 +7,7 @@
 (scroll-bar-mode -1)
 (menu-bar-mode -1)
 (global-display-line-numbers-mode 1)
+(global-hl-line-mode 1)
 
 ;; ── Fontes ─────────────────────────────────────────────────────────
 (set-face-attribute 'default nil :family "Hack" :height 135)
@@ -34,7 +35,7 @@
         (bg-completion-match-1 "#1e1e2e")
         (bg-completion-match-2 "#1e1e2e")
         (bg-completion-match-3 "#1e1e2e")
-        (bg-hl-line "#2a2b3d")
+        (bg-hl-line "#45475a")
         (bg-hover-secondary "#585b70")
         (bg-line-number-active unspecified)
         (bg-line-number-inactive "#1e1e2e")
@@ -167,7 +168,7 @@
             (format "L%d:C%d" (line-number-at-pos) (current-column))
             'face 'shadow))
     "  "
-    (:eval (when vc-mode
+    (:eval (when (stringp vc-mode)
              (propertize
               (replace-regexp-in-string
                "^ " "" (substring-no-properties vc-mode))

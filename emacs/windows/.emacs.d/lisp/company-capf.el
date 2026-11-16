@@ -58,7 +58,7 @@ so we can't just use the preceding variable instead.")
         data))))
 
 (defun company--contains (elt lst)
-  (when-let ((cur (car lst)))
+  (when-let* ((cur (car lst)))
     (cond
      ((symbolp cur)
       (or (eq elt cur)

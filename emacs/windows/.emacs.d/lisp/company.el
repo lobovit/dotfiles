@@ -746,11 +746,11 @@ See `company-quick-access-keys' for more details."
 
 (defun company-keymap--quick-access-modifier ()
   "Return string representation of the `company-quick-access-modifier'."
-  (if-let ((modifier (assoc-default company-quick-access-modifier
-                                    '((meta . "M")
-                                      (super . "s")
-                                      (hyper . "H")
-                                      (control . "C")))))
+  (if-let* ((modifier (assoc-default company-quick-access-modifier
+                                      '((meta . "M")
+                                        (super . "s")
+                                        (hyper . "H")
+                                        (control . "C")))))
       modifier
     (warn "company-quick-access-modifier value unknown: %S"
           company-quick-access-modifier)
@@ -1616,7 +1616,7 @@ end of the match."
   :type 'integer)
 
 (defun company--render-icons-margin (icon-mapping root-dir candidate selected)
-  (if-let ((ws (window-system))
+  (if-let* ((ws (window-system))
            (candidate candidate)
            (kind (company-call-backend 'kind candidate))
            (icon-file (or (alist-get kind icon-mapping)
@@ -1744,10 +1744,10 @@ See `company-text-icons-mapping'."
 
 (defun company-text-icons-margin (candidate selected)
   "Margin function which returns unicode icons."
-  (when-let ((candidate candidate)
-             (kind (company-call-backend 'kind candidate))
-             (conf (or (alist-get kind company-text-icons-mapping)
-                       (alist-get t company-text-icons-mapping))))
+  (when-let* ((candidate candidate)
+              (kind (company-call-backend 'kind candidate))
+              (conf (or (alist-get kind company-text-icons-mapping)
+                        (alist-get t company-text-icons-mapping))))
     (cl-destructuring-bind (icon &optional fg bg) conf
       (propertize
        (format company-text-icons-format icon)
@@ -1809,9 +1809,9 @@ PROPERTY return nil."
 
 (defun company-dot-icons-margin (candidate selected)
   "Margin function that uses a colored dot to display completion kind."
-  (when-let ((kind (company-call-backend 'kind candidate))
-             (conf (or (assoc-default kind company-text-icons-mapping)
-                       (assoc-default t company-text-icons-mapping))))
+  (when-let* ((kind (company-call-backend 'kind candidate))
+              (conf (or (assoc-default kind company-text-icons-mapping)
+                        (assoc-default t company-text-icons-mapping))))
     (cl-destructuring-bind (_icon &optional fg bg) conf
       (propertize company-dot-icons-format
                   'face
@@ -3875,6 +3875,8 @@ Delay is determined by `company-tooltip-idle-delay'."
         (message-truncate-lines company-echo-truncate-lines))
     (when getter
       (setq company-echo-last-msg (funcall getter)))
+    (unless (stringp company-echo-last-msg)
+      (setq company-echo-last-msg nil))
     ;; Avoid modifying the echo area if we don't have anything to say, and we
     ;; didn't put the previous message there (thus there's nothing to clear),
     ;; https://debbugs.gnu.org/cgi/bugreport.cgi?bug=62816#20

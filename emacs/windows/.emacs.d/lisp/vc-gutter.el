@@ -13,26 +13,28 @@
   (when (and (stringp buffer-file-name)
              (executable-find "git")
              (vc-backend buffer-file-name))
-    (with-temp-buffer
-      (let ((default-directory (file-name-directory buffer-file-name)))
-        (call-process "git" nil t nil "diff" "--no-color" "-U0" "--"
-                      (file-relative-name buffer-file-name)))
-      (goto-char (point-min))
-      (let ((result nil))
-        (while (re-search-forward
-                "^@@ -\\([0-9]+\\),\\([0-9]+\\) \\+\\([0-9]+\\),\\([0-9]+\\)"
-                nil t)
-          (let* ((old-cnt (string-to-number (match-string 2)))
-                 (new-start (string-to-number (match-string 3)))
-                 (new-cnt (string-to-number (match-string 4)))
-                 (type (cond ((= new-cnt old-cnt) 'vc-gutter-modified)
-                             ((= old-cnt 0) 'vc-gutter-added)
-                             ((= new-cnt 0) 'vc-gutter-removed)
-                             (t 'vc-gutter-modified))))
-            (dotimes (i (max old-cnt new-cnt))
-              (let ((line (if (> new-cnt 0) (+ new-start i) new-start)))
-                (push (cons line type) result)))))
-        (nreverse result)))))
+    (let ((dir (file-name-directory buffer-file-name)))
+      (when (stringp dir)
+        (with-temp-buffer
+          (let ((default-directory dir))
+            (call-process "git" nil t nil "diff" "--no-color" "-U0" "--"
+                          (file-relative-name buffer-file-name)))
+          (goto-char (point-min))
+          (let ((result nil))
+            (while (re-search-forward
+                    "^@@ -\\([0-9]+\\),\\([0-9]+\\) \\+\\([0-9]+\\),\\([0-9]+\\)"
+                    nil t)
+              (let* ((old-cnt (string-to-number (match-string 2)))
+                     (new-start (string-to-number (match-string 3)))
+                     (new-cnt (string-to-number (match-string 4)))
+                     (type (cond ((= new-cnt old-cnt) 'vc-gutter-modified)
+                                 ((= old-cnt 0) 'vc-gutter-added)
+                                 ((= new-cnt 0) 'vc-gutter-removed)
+                                 (t 'vc-gutter-modified))))
+                (dotimes (i (max old-cnt new-cnt))
+                  (let ((line (if (> new-cnt 0) (+ new-start i) new-start)))
+                    (push (cons line type) result)))))
+            (nreverse result)))))))
 
 (defun vc-gutter--clear ()
   (mapc #'delete-overlay vc-gutter--overlays)

@@ -14,6 +14,20 @@
             (setq gc-cons-threshold 80000000
                   gc-cons-percentage 0.1)))
 
+;; ── Toolchain C em D:\softwares\ (winget --location) ───────────────
+;; Garante que Emacs encontra clangd, gcc/cc, cmake, ninja e git mesmo
+;; sem reiniciar o Windows após o winget install.
+(dolist (dir '("D:/softwares/LLVM/bin"
+               "D:/softwares/CMake/bin"
+               "D:/softwares/Ninja"
+               "D:/softwares/WinLibs/mingw64/bin"
+               "D:/softwares/make"
+               "D:/softwares/msys64/mingw64/bin"))
+  (when (file-directory-p dir)
+    (add-to-list 'exec-path dir)
+    (unless (string-match-p (regexp-quote dir) (or (getenv "PATH") ""))
+      (setenv "PATH" (concat dir ";" (getenv "PATH"))))))
+
 ;; ── Encoding ───────────────────────────────────────────────────────
 (prefer-coding-system 'utf-8)
 (set-default-coding-systems 'utf-8)
@@ -30,7 +44,8 @@
 (package-initialize)
 (unless package-archive-contents
   (package-refresh-contents))
-(dolist (p '(consult vertico orderless org-modern ghostel markdown-mode))
+(dolist (p '(consult vertico orderless org-modern ghostel markdown-mode
+               kotlin-ts-mode flycheck))
   (unless (package-installed-p p)
     (package-install p)))
 
@@ -56,6 +71,7 @@
 (my/load "dashboard")
 (setq initial-buffer-choice #'my/dashboard-refresh)
 (my/load "completion")
+(my/load "lint")
 (my/load "windows")
 (my/load "treesitter")
 (my/load "langs/go")
@@ -65,6 +81,7 @@
 (my/load "langs/yaml")
 (my/load "langs/csharp")
 (my/load "langs/markdown")
+(my/load "langs/kotlin")
 (my/load "langs/docker")
 (my/load "langs/org")
 (my/load "tools/git")
@@ -115,3 +132,4 @@
  '(tab-bar-tab-inactive ((((class color) (min-colors 256)) :background "#1e1e2e" :foreground "#a6adc8")))
  '(vc-dir-file ((((class color) (min-colors 256)) :foreground "#89b4fa")))
  '(vc-dir-header-value ((((class color) (min-colors 256)) :foreground "#b4befe"))))
+(put 'upcase-region 'disabled nil)

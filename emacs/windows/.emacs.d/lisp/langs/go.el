@@ -5,7 +5,7 @@
 (require 'project)
 
 (defun project-find-go-module (dir)
-  (when-let ((root (locate-dominating-file dir "go.mod")))
+  (when-let* ((root (locate-dominating-file dir "go.mod")))
     (cons 'go-module root)))
 
 (cl-defmethod project-root ((project (head go-module)))
@@ -59,10 +59,7 @@
 (add-hook 'go-ts-mode-hook #'eglot-ensure)
 (add-hook 'go-mod-ts-mode-hook #'eglot-ensure)
 
-;; ── Flymake ────────────────────────────────────────────────────────
-(global-set-key (kbd "C-c ! n") #'flymake-goto-next-error)
-(global-set-key (kbd "C-c ! p") #'flymake-goto-prev-error)
-(global-set-key (kbd "C-c ! l") #'flymake-show-buffer-diagnostics)
+;; ── Flycheck (ver lisp/lint.el; C-c ! n/p/l) ───────────────────────
 
 (provide 'go)
 ;;; go.el ends here

@@ -11,7 +11,8 @@
 (defun my/c-run ()
   "Run the most recently built C/C++ binary, if present."
   (interactive)
-  (compile "cmake --build build && ./build/main"))
+  ;; No Windows o binário termina em .exe; tenta ./build/main e ./build/main.exe.
+  (compile "cmake --build build && (./build/main || ./build/main.exe || ./build/Debug/main.exe)"))
 
 (defun my/c-format-buffer ()
   "Format current buffer with clang-format."
@@ -34,13 +35,17 @@
   (add-hook hook #'my/c-mode-hook))
 
 ;; ── Eglot (built-in) ───────────────────────────────────────────────
+;; clangd instalado via winget em D:/softwares/LLVM/bin (ver init.el).
+;; Habilita eglot sempre; se clangd estiver ausente o Emacs avisa apenas
+;; ao abrir um buffer C, em vez de silenciosamente não ativar o LSP.
 (with-eval-after-load 'eglot
   (add-to-list 'eglot-server-programs '(c-ts-mode . ("clangd")))
-  (add-to-list 'eglot-server-programs '(c++-ts-mode . ("clangd"))))
+  (add-to-list 'eglot-server-programs '(c++-ts-mode . ("clangd")))
+  (add-to-list 'eglot-server-programs '(c-mode . ("clangd")))
+  (add-to-list 'eglot-server-programs '(c++-mode . ("clangd"))))
 
-(when (executable-find "clangd")
-  (add-hook 'c-ts-mode-hook #'eglot-ensure)
-  (add-hook 'c++-ts-mode-hook #'eglot-ensure))
+(add-hook 'c-ts-mode-hook #'eglot-ensure)
+(add-hook 'c++-ts-mode-hook #'eglot-ensure)
 
 ;; ── Clang-format config ────────────────────────────────────────────
 (with-eval-after-load 'cc-mode
