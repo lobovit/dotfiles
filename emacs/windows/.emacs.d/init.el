@@ -45,7 +45,7 @@
 (unless package-archive-contents
   (package-refresh-contents))
 (dolist (p '(consult vertico orderless org-modern ghostel markdown-mode
-               kotlin-ts-mode flycheck))
+               kotlin-ts-mode flycheck hacker-typer))
   (unless (package-installed-p p)
     (package-install p)))
 

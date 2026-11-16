@@ -57,6 +57,7 @@
 (define-key my/leader-map (kbd "t d")   #'my/dired-sidebar-toggle)
 (define-key my/leader-map (kbd "t l")   #'display-line-numbers-mode)
 (define-key my/leader-map (kbd "t n")   #'display-line-numbers-mode)
+(define-key my/leader-map (kbd "t h")   #'hacker-typer)
 
 ;; ── Navegacao ──────────────────────────────────────────────────────
 (define-key my/leader-map (kbd "j")     #'my/ace-window)
