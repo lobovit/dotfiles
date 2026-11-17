@@ -45,10 +45,13 @@
 (unless package-archive-contents
   (package-refresh-contents))
 (dolist (p '(consult vertico orderless org-modern ghostel markdown-mode
-               kotlin-ts-mode flycheck hacker-typer))
+               kotlin-ts-mode flycheck))
   (unless (package-installed-p p)
     (package-install p)))
 
+;; hacker-typer: fork local (cenas hacker-typer-scene:), fora do MELPA.
+(add-to-list 'load-path "D:/projects/emacs-hacker-typer")
+(require 'hacker-typer)
 ;; Um caractere por tecla (default insere 3–6).
 (setq hacker-typer-type-rate 1)
 
