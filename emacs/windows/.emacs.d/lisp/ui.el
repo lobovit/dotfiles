@@ -10,11 +10,11 @@
 (global-hl-line-mode 1)
 
 ;; ── Fontes ─────────────────────────────────────────────────────────
-(let ((candidates '("JetBrains Mono" "Cascadia Code" "Hack" "Consolas")))
+(let ((candidates '("Cascadia Code" "JetBrains Mono" "Hack" "Consolas")))
   (set-face-attribute 'default nil
                       :family (or (seq-find (lambda (f) (member f (font-family-list)))
                                             candidates)
-                                  "JetBrains Mono")
+                                  "Cascadia Code")
                       :height 135))
 (when (member "Segoe UI Emoji" (font-family-list))
   (set-fontset-font t 'unicode "Segoe UI Emoji" nil 'prepend))
